@@ -45,6 +45,7 @@ export default function SignUp() {
                 // history.push("./dashboard")
                 console.log("SignUp-User", obj)
                 setState(initialState)
+                firebase.auth().signOut()
             })
             .catch((error) => {
                 var errorCode = error.code;
@@ -93,6 +94,7 @@ export default function SignUp() {
                                 onChange={handleChange}
                             />
                         </Form.Group>
+                        
                         <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
                     </Form>
                 </Card>
