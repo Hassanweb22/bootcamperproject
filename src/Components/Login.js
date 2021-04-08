@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button, Card } from "react-bootstrap"
-import { useHistory } from 'react-router-dom'
+import { Form, Button, Card, Alert } from "react-bootstrap"
+import { useHistory, Link } from 'react-router-dom'
 import firebase from "../Components/firebase/index"
-import { Link } from "react-router-dom"
-// import "./style.css"
+import "./style.css"
 
 export default function Login() {
     let history = useHistory()
@@ -12,12 +11,17 @@ export default function Login() {
         password: "",
     }
     const [state, setState] = useState(initialState)
-    const [error, setError] = useState("")
+    const [validationError, setvalidationError] = useState({
+        email: "",
+        password: "",
+        access: ""
+    })
 
     let { email, password } = state
 
     useEffect(() => {
         console.log("isUserLogedIn", firebase.auth().currentUser)
+        return () => console.log("Login Component unmounted")
     }, [])
 
     const handleChange = (e) => {
@@ -30,19 +34,36 @@ export default function Login() {
     const handleSubmit = (e) => {
         e.preventDefault()
         console.log("state", state)
+        setvalidationError(initialState)
         firebase.auth().signInWithEmailAndPassword(email, password)
-            .then((user) => {
+            .then(({user}) => {
                 // var userInfo = userCredential.user;
-                history.push("./dashboard")
+                if (user.email === "admin@gmail.com") {
+                    history.push("./adminDashboard")
+                }
+                else {
+                    history.push("./dashboard")
+                }
                 console.log("Loginuser", user)
                 setState(initialState)
+                setvalidationError(initialState)
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-                    // setError(error.message)
-                    window.alert(errorCode + "/n" + errorMessage)
+                console.log({ errorCode, errorMessage })
+                if (error.code === "auth/user-not-found") {
+                    setvalidationError({ ...validationError, email: "User have not found or may Have deleted" })
+                    // window.alert(errorCode + "/n" + errorMessage)
+                }
+                else if (error.code === "auth/wrong-password") {
+                    setvalidationError({ ...validationError, password: "Password May not be Correct" })
+                }
+                else if (error.code === "auth/too-many-requests") {
+                    setvalidationError({ ...validationError, access: "Too many try, Now Access to this account has disabled" })
+                }
+                else {
+                    setvalidationError(initialState)
                 }
             });
     }
@@ -52,35 +73,44 @@ export default function Login() {
     return (
 
         <div className="container mt-5">
-            <h2 className="text-center text-capitalize main_heading mt-3">Login</h2>
+            <div className="users_heading">
+                <h2 className="text-center text-capitalize">Login</h2>
+            </div>
+
             <div className="row">
-                <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
-                    <Form className="my-3" onSubmit={handleSubmit}>
+                <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto py-3" style={{ width: '40rem' }}>
+                    {(validationError?.access) ? <Alert className="mt-3" variant={"danger"}>{validationError.access}</Alert> : null}
+                    <Form className="mb-3" onSubmit={handleSubmit}>
                         <Form.Group controlId="formTitle">
                             <Form.Label>Email</Form.Label>
-                            <Form.Control type="email" placeholder="Enter Email"
+                            <Form.Control className={validationError.email ? "is-invalid" : ""} type="email" placeholder="Enter Email"
                                 name="email"
                                 value={email}
                                 onChange={handleChange}
                             />
+                            <Form.Text className="text-danger">{validationError.email}</Form.Text>
                         </Form.Group>
 
                         <Form.Group controlId="formDescription">
                             <Form.Label>Password</Form.Label>
-                            <Form.Control type="password" placeholder="Password"
+                            <Form.Control className={validationError.password ? "is-invalid" : ""} type="password" placeholder="Password"
                                 name="password"
                                 value={password}
                                 onChange={handleChange}
                             />
+                            <Form.Text className="text-danger">{validationError.password}</Form.Text>
                         </Form.Group>
-                        <hr />
-                        <div className="text-center mb-2 d-flex justify-content-center">
+                        <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
+                    </Form>
+                    {/* <hr /> */}
+                    <div className="text-center mb-2 d-flex flex-column justify-content-center">
+                        <b>OR</b>
+                        <div>
                             <Link to="./signup" className="mx-2">Create Account</Link>
                             <span>|</span>
                             <Link to="./forget" className="mx-2">Forget Password</Link>
                         </div>
-                        <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
-                    </Form>
+                    </div>
                 </Card>
             </div>
         </div >

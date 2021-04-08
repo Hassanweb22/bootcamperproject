@@ -1,0 +1,33 @@
+.users_heading {
+  margin: 20px;
+}
+.users_heading h2 {
+  color: #796e6e;
+  font-family: "Raleway", sans-serif;
+  font-size: 45px;
+  font-weight: 800;
+  line-height: 72px;
+  margin: 0 0 0px;
+  text-align: center;
+  text-transform: uppercase;
+}
+@media screen and (max-width: 550px) {
+  .users_heading h2 {
+    font-size: 33px;
+    font-weight: 800;
+    line-height: 30px;
+  }
+}
+
+table thead {
+  border-radius: 10px;
+}
+/* table thead{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+
+.navbar-brand{
+    font-size: 20px;
+}

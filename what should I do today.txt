@@ -1,0 +1,5 @@
+signup validation ==> (done)
+users should succefully signup and his databse should also created in clients section in frebase ==> (done)
+existing Logined user can be able to add booking which will be send through his specific uid in booking object ==> (done)
+you have to show all of his booking in seprate table 
+while user sending booking data in his uid booking object that should also send in admins folder

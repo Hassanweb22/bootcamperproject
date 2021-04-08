@@ -3,8 +3,7 @@ import { Form, Button, Card, Row, Container } from "react-bootstrap"
 // import { X } from "react-bootstrap-icons"
 // import { useHistory } from 'react-router-dom'
 import firebase from "../firebase/index.js"
-import ShowBookings from './ShowBookings.js'
-// import "./style.css"/
+import "../style.css"
 
 
 export default function SignUp() {
@@ -17,10 +16,21 @@ export default function SignUp() {
     }
 
     const [state, setState] = useState(initialState)
-    const [error, setError] = useState("")
+    const [currentUser, setcurrentUser] = useState({})
     let { username, location, userDate, startTime, endTime } = state
 
     useEffect(() => {
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
+                    console.log("AddBooking userData FireBase", snapshot.val())
+                    setcurrentUser(snapshot.val())
+                })
+            } else {
+                console.log("No user Found", user?.uid)
+            }
+        });
+        return () => console.log("AddBooking unmounted")
     }, [])
 
     const handleChange = (e) => {
@@ -33,28 +43,41 @@ export default function SignUp() {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log("state", state)
-        // console.log("Signupuser", user.uid)
-        let no = Math.floor(Math.random() * 10 - 3 + 21);
+        // console.log("state", state)
 
-        firebase.database().ref('users/').child(no).set(
-            state,
+        console.log({ currentUser })
+        const { uid } = firebase.auth().currentUser
+        const key = firebase.database().ref("clients").child(uid).child("/bookings").push().key
+        let bookingObj = { bookingId: key, location, userDate, startTime, endTime }
+        let adminBookingObj = { bookingId: key, uid, location, userDate, startTime, endTime }
+        console.log("bookingObj", bookingObj)
+        firebase.database().ref('clients/').child(uid).child(`/bookings/${key}`).set(
+            bookingObj,
             err => {
                 if (err) {
                     console.log("error", err)
                 }
             });
+        firebase.database().ref('admin/').child(`/bookings/${key}`).set(
+            adminBookingObj,
+            err => {
+                if (err) {
+                    console.log("error", err)
+                }
+            });
+        console.log("adminBookingObj", adminBookingObj)
         setState(initialState)
-        // history.push("./dashboard")
     }
 
-    let validate = () => (username && location && startTime && endTime) ? true : false
+    let validate = () => (location && startTime && endTime) ? true : false
 
 
     return (
 
         <div className="container mt-5">
-            <h2 className="text-center text-capitalize main_heading mt-3">Parking Booking</h2>
+            <div className="users_heading">
+                <h2 className="text-center text-capitalize">Parking Booking</h2>
+            </div>
             <div className="row show">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
 
@@ -63,7 +86,8 @@ export default function SignUp() {
                             <Form.Label>Username</Form.Label>
                             <Form.Control type="text" placeholder="Enter Username"
                                 name="username"
-                                value={username}
+                                disabled
+                                value={String(currentUser.username).toUpperCase()}
                                 onChange={handleChange}
                             />
                         </Form.Group>
@@ -74,6 +98,7 @@ export default function SignUp() {
                                 <option value="" className="font-weight-bold">Select Location</option>
                                 <option value="tower">Tower</option>
                                 <option value="malir">Malir</option>
+                                <option value="nagan churangi">Nagan Churangi</option>
                                 <option value="nazimabad">Nazimabad</option>
                             </Form.Control>
                         </Form.Group>
