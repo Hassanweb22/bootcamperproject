@@ -69,7 +69,7 @@ export default function SignUp() {
         setState(initialState)
     }
 
-    let validate = () => (location && startTime && endTime) ? true : false
+    let validate = () => (location && startTime && endTime !=="None") ? true : false
 
 
     return (
@@ -119,10 +119,14 @@ export default function SignUp() {
 
                             </Form.Group>
                             <Form.Group className="col-md-6 " controlId="exampleForm.dateTime">
-                                <Form.Label>End Time</Form.Label>
-                                <Form.Control type="time" name="endTime" value={endTime}
-                                    onChange={handleChange}
-                                />
+                                <Form.Label>End Time</Form.Label> 
+                                <Form.Control as="select" name="endTime" value={endTime} onChange={handleChange}>
+                                    <option value="None" className="font-weight-bold">None</option>
+                                    <option value="tower">Tower</option>
+                                    <option value="malir">Malir</option>
+                                    <option value="nagan churangi">Nagan Churangi</option>
+                                    <option value="nazimabad">Nazimabad</option>
+                                </Form.Control>
                             </Form.Group>
                         </Row>
 

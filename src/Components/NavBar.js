@@ -8,7 +8,6 @@ import "./style.css"
 export default function NavBar() {
   let history = useHistory()
 
-  const [state, setstate] = useState({})
   const [loginUser, setloginUser] = useState({})
 
   useEffect(() => {
@@ -39,9 +38,9 @@ export default function NavBar() {
             {!loginUser ?
               < Nav.Link onClick={() => history.push("./signup")}>SignUp</Nav.Link>
               :
-              <> <Nav.Link onClick={() => history.push(loginUser.email === "admin@gmail.com" ? "./admindashboard" : "/dashboard")}>{loginUser.email === "admin@gmail.com" ? "Admin Dashboard" : "User Dashboard"}</Nav.Link>
-                <Nav.Link onClick={() => history.push(loginUser.email === "admin@gmail.com" ? "./allbookings" : "/addbookings")}>{loginUser.email === "admin@gmail.com" ? "All Bookings" : "Add Bookings"}</Nav.Link>
-                <Nav.Link onClick={() => history.push("./showbookings")}>{loginUser.email === "admin@gmail.com" ? "All Bookings" : "Add Bookings"}</Nav.Link>
+              <> <Nav.Link onClick={() => history.push("/dashboard")}>User Dashboard</Nav.Link>
+                <Nav.Link onClick={() => history.push("/addbookings")}>Add Bookings</Nav.Link>
+                <Nav.Link onClick={() => history.push("./showbookings")}>Show Bookings</Nav.Link>
               </>
             }
           </Nav>
@@ -58,5 +57,3 @@ export default function NavBar() {
     </div >
   )
 }
-
-

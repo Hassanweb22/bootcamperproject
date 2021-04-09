@@ -7,19 +7,7 @@ export default function Dashboard() {
     let history = useHistory()
     const [currentUser, setcurrentUser] = useState({})
 
-    useEffect(() => {
-        // setcurrentUser(firebase.auth().currentUser)
-        firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
-                    setcurrentUser(snapshot.val())
-                })
-            } else {
-                console.log("No user Found", user?.uid)
-            }
-        });
-        return () => console.log("Dashboard Unmounted")
-    }, [firebase.auth().currentUser])
+
     console.log("dashboardUser", currentUser)
     return (
         <div>

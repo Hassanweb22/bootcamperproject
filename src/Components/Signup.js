@@ -42,8 +42,16 @@ export default function SignUp() {
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(({ user }) => {
                 let obj = { username, email: user.email, key: user.uid, bookings: {} }
+                let adminObj = { username, email: user.email, key: user.uid }
                 console.log("Signupuser", user.uid)
                 firebase.database().ref('clients/').child(user.uid).set(
+                    obj,
+                    err => {
+                        if (err) {
+                            console.log("error", err)
+                        }
+                    });
+                firebase.database().ref('admin/').child("users/").child(user.uid).set(
                     obj,
                     err => {
                         if (err) {

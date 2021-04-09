@@ -30,13 +30,14 @@ export default function Login() {
             ...state,
             [name]: value,
         })
+        setvalidationError({ ...validationError, email: "", password: "" })
     }
     const handleSubmit = (e) => {
         e.preventDefault()
         console.log("state", state)
         setvalidationError(initialState)
         firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(({user}) => {
+            .then(({ user }) => {
                 // var userInfo = userCredential.user;
                 if (user.email === "admin@gmail.com") {
                     history.push("./adminDashboard")
