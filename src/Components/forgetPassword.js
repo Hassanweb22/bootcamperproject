@@ -3,7 +3,7 @@ import { Form, Button, Card } from "react-bootstrap"
 import { useHistory } from 'react-router-dom'
 import firebase from "../Components/firebase/index"
 import { Link } from "react-router-dom"
-// import "./style.css"
+import "./style.css"
 
 export default function Login() {
     let history = useHistory()
@@ -48,7 +48,9 @@ export default function Login() {
     return (
 
         <div className="container mt-5">
-            <h2 className="text-center text-capitalize main_heading mt-3">Forget Password</h2>
+              <div className="users_heading">
+                <h2 className="text-center text-capitalize">Forget Password</h2>
+            </div>
             <div className="row">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto" style={{ width: '40rem' }}>
                     <Form className="my-3" onSubmit={handleSubmit}>

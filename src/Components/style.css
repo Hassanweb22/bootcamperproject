@@ -2,7 +2,7 @@
   margin: 20px;
 }
 .users_heading h2 {
-  color: #796e6e;
+  color: #17a2b8;
   font-family: "Raleway", sans-serif;
   font-size: 45px;
   font-weight: 800;
@@ -10,6 +10,8 @@
   margin: 0 0 0px;
   text-align: center;
   text-transform: uppercase;
+  text-shadow: -1px 2px 5px #17a3b850,
+    0px -1px 10px #272929a8;
 }
 @media screen and (max-width: 550px) {
   .users_heading h2 {
@@ -28,6 +30,10 @@ table thead {
     align-items: center;
 } */
 
-.navbar-brand{
-    font-size: 20px;
+.navbar-brand {
+  font-size: 20px;
+}
+
+.card_body a:hover{
+  text-decoration: none;
 }

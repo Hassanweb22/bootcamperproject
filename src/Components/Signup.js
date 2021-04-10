@@ -34,6 +34,8 @@ export default function SignUp() {
             ...state,
             [name]: value,
         })
+        setvalidationError({ ...validationError, email: "", password: "" })
+
     }
 
     const handleSubmit = (e) => {
@@ -80,7 +82,7 @@ export default function SignUp() {
 
     return (
 
-        <div className="container mt-5">
+        <div className="container my-5">
             <div className="users_heading">
                 <h2 className="text-center text-capitalize">Sign Up</h2>
             </div>

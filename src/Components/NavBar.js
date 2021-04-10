@@ -13,15 +13,33 @@ export default function NavBar() {
   useEffect(() => {
     console.log("NavBar");
     firebase.auth().onAuthStateChanged((user) => {
-      console.log("user", user)
+      // console.log("user", user)
       setloginUser(user)
     })
-    return () => console.log("soomething has removed")
+    return () => console.log("navBar has removed")
   }, [])
+
+  const adminNav = (loginUser?.email === "admin@gmail.com") ?
+    <> <Nav.Link onClick={() => history.push("/admindashboard")}>Admin Dashboard</Nav.Link>
+      <Nav.Link onClick={() => history.push("/allusers")}>All Users</Nav.Link>
+      <Nav.Link onClick={() => history.push("/allbookings")}>All Bookings</Nav.Link>
+    </> :
+    <> <Nav.Link onClick={() => history.push("/dashboard")}>User Dashboard</Nav.Link>
+      <Nav.Link onClick={() => history.push("/showbookings")}>Show Bookings</Nav.Link>
+      <Nav.Link onClick={() => history.push("/locations")}>Locations</Nav.Link>
+    </>
+
+  const logoNav = (loginUser?.email === "admin@gmail.com") ?
+    <Navbar.Brand style={{ cursor: "pointer" }}
+      onClick={() => history.push(!firebase.auth().currentUser ? "/" : "/admindashboard")}>Parking App
+    </Navbar.Brand>
+    : <Navbar.Brand style={{ cursor: "pointer" }}
+      onClick={() => history.push(!firebase.auth().currentUser ? "/" : "/dashboard")}>Parking App
+      </Navbar.Brand>
 
   const signOut = () => {
     firebase.auth().signOut()
-    history.push("./")
+    history.push("/")
     console.log("LogOut")
   }
   // console.log("setuser", state.email)
@@ -30,18 +48,13 @@ export default function NavBar() {
     <div>
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Navbar.Toggle className={`responsive-navbar-nav`} aria-controls="responsive-navbar-nav" />
-        <Navbar.Brand style={{ cursor: "pointer" }}
-          onClick={() => history.push(!firebase.auth().currentUser ? "/" : "/dashboard")}
-        >Parking App</Navbar.Brand>
+        {logoNav}
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
             {!loginUser ?
-              < Nav.Link onClick={() => history.push("./signup")}>SignUp</Nav.Link>
+              < Nav.Link onClick={() => history.push("/signup")}>SignUp</Nav.Link>
               :
-              <> <Nav.Link onClick={() => history.push("/dashboard")}>User Dashboard</Nav.Link>
-                <Nav.Link onClick={() => history.push("/addbookings")}>Add Bookings</Nav.Link>
-                <Nav.Link onClick={() => history.push("./showbookings")}>Show Bookings</Nav.Link>
-              </>
+              adminNav
             }
           </Nav>
           <Form inline>

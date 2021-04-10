@@ -43,10 +43,10 @@ export default function Dashboard() {
                             < Row className="mt-3">
                                 <Col className="text-center">
                                     <Button className=" rounded-5 px-4 py-2" variant="success"
-                                        onClick={() => history.push("./addBookings")}>Add Bookings</Button>
+                                        onClick={() => history.push("/locations")}>Show Locations</Button>
 
                                     <Button className="rounded-5 mx-3 px-4 py-2" variant="success"
-                                        onClick={() => history.push("./showBookings")}>Show Bookings</Button>
+                                        onClick={() => history.push("/showBookings")}>Show Bookings</Button>
                                 </Col>
                             </Row>
                         </Card.Body>

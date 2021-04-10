@@ -5,10 +5,22 @@ import firebase from '../Components/firebase/index'
 
 export default function Dashboard() {
     let history = useHistory()
-    const [currentUser, setcurrentUser] = useState({})
+    let  [admin, setAdmin] = useState({})
 
+    useEffect(() => {
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
+                    setAdmin(snapshot.val())
+                })
+            } else {
+                console.log("No user Found", user?.uid)
+            }
+        });
+        return () => console.log("AdminDashboard has removed")
+    }, [])
 
-    console.log("dashboardUser", currentUser)
+    console.log("dashboardadmin", admin)
     return (
         <div>
             <div className="container">
@@ -21,7 +33,7 @@ export default function Dashboard() {
                         <Card.Body>
                             <Card.Title className="text-center text-capitalize font-italic text-info"
                                 style={{ fontSize: 25 }}
-                            >Welcome Dear ! {currentUser ? currentUser?.username : "User"}</Card.Title>
+                            >Welcome Dear ! {admin?.username}</Card.Title>
                             <Row>
                                 {/* {!fire.auth().currentUser?.uid ? */}
                                 {/* <Card.Text className="text-center mx-auto font-weight-bold">You can Add New Bookings </Card.Text>
