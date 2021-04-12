@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Table } from "react-bootstrap"
 import firebase from "../Components/firebase/index"
-import Remove from "./RemoveUser"
+import Block from "./RemoveUser"
 
 
 function AllBookings() {
@@ -12,10 +12,22 @@ function AllBookings() {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 setcurrentUser(user)
-                firebase.database().ref("admin/").child("users").on("value", snapshot => {
+                // firebase.database().ref("admin/").child("users").on("value", snapshot => {
+                //     console.log("Admin_AllBookings_FireBase", snapshot.val())
+                //     if (snapshot.val() !== null) {
+                //         setAllUsers(snapshot.val())
+                //     }
+                // })
+                firebase.database().ref("clients/").on("value", snapshot => {
                     console.log("Admin_AllBookings_FireBase", snapshot.val())
                     if (snapshot.val() !== null) {
-                        setAllUsers(snapshot.val())
+                        let allusers = Object.keys(snapshot.val()).filter(user => {
+                            return snapshot.val()[user].username !== "admin"
+                        }).map(user => {
+                            return snapshot.val()[user]
+                        })
+                        console.log("except admin", allusers)
+                        setAllUsers(allusers)
                     }
                 })
             } else {
@@ -27,6 +39,7 @@ function AllBookings() {
         }
     }, [])
     console.log({ allUsers, currentUser })
+
 
     return (
         <div className="container my-5">
@@ -48,12 +61,12 @@ function AllBookings() {
                             </tr>
                         </thead>
                         <tbody className="bg-light">
-                            {Object.keys(allUsers).map(key => {
-                                return <tr key={key}>
+                            {allUsers.map(user => {
+                                return <tr key={user.key}>
                                     {/* <td>{key}</td> */}
-                                    <td>{allUsers[key].username}</td>
-                                    <td>{allUsers[key].email}</td>
-                                    <td><Remove item={allUsers[key]} id={key} size="sm" variant="danger" /></td>
+                                    <td>{user.username}</td>
+                                    <td>{user.email}</td>
+                                    <td><Block item={user} block={user.block} id={user.key} size="sm" variant="danger" /></td>
                                 </tr>
                             })}
                         </tbody>

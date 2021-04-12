@@ -4,6 +4,7 @@ import { Form, Button, Card, Row, Container } from "react-bootstrap"
 import { useHistory, useParams } from 'react-router-dom'
 import firebase from "../firebase/index.js"
 import "../style.css"
+import moment from "moment"
 
 
 export default function NewBookings() {
@@ -19,25 +20,36 @@ export default function NewBookings() {
 
     const [state, setState] = useState(initialState)
     const [currentUser, setcurrentUser] = useState({})
+    const [bookings, setBookings] = useState([])
     let [noOfSlots, setNoOfSlots] = useState([])
     let { location, slots, userDate, startTime, endTime } = state
 
     useEffect(() => {
-        console.log({ address })
-        firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
-                    console.log("AddBooking userData FireBase", snapshot.val())
-                    setcurrentUser(snapshot.val())
+        let newArray = []
+        firebase.database().ref("clients/").on("value", snapshot => {
+            // console.log("NewBookings userData FireBase", snapshot.val())
+            let bookings = Object.keys(snapshot.val()).map(user => {
+                if (snapshot.val()[user].hasOwnProperty('bookings') === true) {
+                    return Object.keys(snapshot.val()[user]?.bookings).map(val => snapshot.val()[user]?.bookings[val])
+                }
+            })
+            bookings.map(user => {
+                Array(user).map(val => {
+                    if (Array.isArray(val)) {
+                        val.forEach(element => {
+                            newArray.push(element)
+                        });
+                    }
                 })
-            } else {
-                console.log("No user Found", user?.uid)
-            }
-        });
+            })
+            setBookings(newArray)
+        })
+
         if (address === "malir") {
             setNoOfSlots(Array(7).fill(1).map((x, y) => x + y))
         }
         else if (address === "bhadurabad") {
+            // abc.time !== state.time
             setNoOfSlots(Array(5).fill(1).map((x, y) => x + y))
         }
         else {
@@ -45,6 +57,23 @@ export default function NewBookings() {
         }
         return () => console.log("newbOOKING unmounted")
     }, [])
+
+    // useEffect(() => {
+
+    //     // let abc = bookings.length && bookings.filter(val => moment(state.userDate).isSame(val.userDate));
+    //     // console.log(abc, "asff")
+    //     // var beginningTime = moment('8:45am', 'h:mma');
+    //     // var endTime = moment('9:00am', 'h:mma');
+    //     bookings.map(user => {
+    //         let date = user.userDate + " " + user.startTime
+    //         // console.log("add 2 hours", moment(date).add(2, "hours").format("H:mm"))
+    //         console.log("Time", { startTime: user.startTime, endTime: moment(date).add(2, "hours").format("H:mm") })
+    //     })
+    //     // console.log("Momentjs", moment().add(2, 'hours').format("YYYY/MM/DD  h:mm:A"))
+    //     // console.log("Time", moment().format("h:mm a").add(2, 'hours'))
+
+    // }, [])
+    console.log("bookings", bookings)
 
     const handleChange = (e) => {
         let { name, value } = e.target
@@ -56,7 +85,7 @@ export default function NewBookings() {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // console.log("state", state)
+        console.log("state", state)
 
         console.log({ currentUser })
         const { uid } = firebase.auth().currentUser
@@ -87,44 +116,32 @@ export default function NewBookings() {
 
     return (
 
-        <div className="container my-5">
+        <div className="container my-3">
             <div className="users_heading">
                 <h2 className="text-center text-capitalize">Parking Booking</h2>
             </div>
             <div className="row show">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
                     <Form className="my-3" onSubmit={handleSubmit}>
-
-                        <Form.Group>
-                            <Form.Label>Select Location</Form.Label>
-                            <Form.Control className="text-capitalize" name="location"
-                                disabled
-                                value={address}
-                            // onChange={handleChange}
-                            >
-                            </Form.Control>
-                        </Form.Group>
-
                         <Row>
-                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>Date</Form.Label>
-                                <Form.Control type="date" name="userDate" value={userDate}
-                                    onChange={handleChange} />
-                            </Form.Group>
-                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>Select Slots</Form.Label>
-                                <Form.Control as="select" name="slots" value={slots} onChange={handleChange}>
-                                    <option value="" className="font-weight-bold">Select</option>
-                                    {noOfSlots.map(value => {
-                                        return <option key={value} value={value}>{value}</option>
-                                    })}
+                            <Form.Group className="col-md-6 col-12">
+                                <Form.Label>Select Location</Form.Label>
+                                <Form.Control className="text-capitalize" name="location"
+                                    disabled
+                                    value={address}>
                                 </Form.Control>
                             </Form.Group>
+                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                <Form.Label>Date</Form.Label>
+                                <Form.Control type="date" min={moment().format("YYYY-MM-DD")} name="userDate" value={userDate}
+                                    onChange={handleChange} />
+                            </Form.Group>
                         </Row>
+
                         <Row>
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>Start Time</Form.Label>
-                                <Form.Control type="time" name="startTime" value={startTime}
+                                <Form.Control type="time" step="3600" name="startTime" value={startTime}
                                     onChange={handleChange}
                                 />
 
@@ -141,8 +158,31 @@ export default function NewBookings() {
                             </Form.Group>
                         </Row>
 
+                        <Row>
+                            <Form.Group className="col-md-12" controlId="exampleForm.dateTime">
+                                <Form.Label>Select Slots</Form.Label>
+                                <Form.Control as="select" disabled={!state.startTime} name="slots" value={slots} onChange={handleChange}>
+                                    <option value="" className="font-weight-bold">Select</option>
+                                    {noOfSlots.map(value => {
+                                        return <option key={value} value={value}>{value}</option>
+                                    })}
+                                </Form.Control>
+                            </Form.Group>
+                        </Row>
+
                         <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
                     </Form>
+                </Card>
+            </div>
+
+            <div className="row my-3 slots_Card">
+                <Card className="container-fluid card_body col-lg-10 col-sm-12 col-md-10 col-12 mx-auto p-3" style={{ width: '40rem' }}>
+                    <h5>Slot No</h5>
+                    <Row className="text-center">
+                            {noOfSlots.map(slot => {
+                                return <div key={slot}>{slot}</div>
+                            })}
+                    </Row>
                 </Card>
             </div>
         </div >

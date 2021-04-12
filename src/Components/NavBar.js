@@ -20,13 +20,15 @@ export default function NavBar() {
   }, [])
 
   const adminNav = (loginUser?.email === "admin@gmail.com") ?
-    <> <Nav.Link onClick={() => history.push("/admindashboard")}>Admin Dashboard</Nav.Link>
+    <>
+      {/* <Nav.Link onClick={() => history.push("/admindashboard")}>Admin Dashboard</Nav.Link> */}
       <Nav.Link onClick={() => history.push("/allusers")}>All Users</Nav.Link>
       <Nav.Link onClick={() => history.push("/allbookings")}>All Bookings</Nav.Link>
     </> :
-    <> <Nav.Link onClick={() => history.push("/dashboard")}>User Dashboard</Nav.Link>
-      <Nav.Link onClick={() => history.push("/showbookings")}>Show Bookings</Nav.Link>
+    <>
+      {/* <Nav.Link onClick={() => history.push("/dashboard")}>User Dashboard</Nav.Link> */}
       <Nav.Link onClick={() => history.push("/locations")}>Locations</Nav.Link>
+      <Nav.Link onClick={() => history.push("/showbookings")}>Show Bookings</Nav.Link>
     </>
 
   const logoNav = (loginUser?.email === "admin@gmail.com") ?
@@ -51,10 +53,9 @@ export default function NavBar() {
         {logoNav}
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
-            {!loginUser ?
-              < Nav.Link onClick={() => history.push("/signup")}>SignUp</Nav.Link>
-              :
+            {loginUser ?
               adminNav
+              : null
             }
           </Nav>
           <Form inline>

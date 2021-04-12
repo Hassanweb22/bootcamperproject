@@ -29,32 +29,46 @@ export default function Routes() {
                     setLoginUser(user)
                 }
             }
+            else {
+                setAdmin({})
+                setLoginUser({})
+            }
         })
-        // firebase.database().ref("clients/").on("value", snapshot => {
-        //   console.log("NavBar FbDatabase", snapshot.val())
-        // })
 
         return () => console.log("something has removed")
     }, [firebase.auth().currentUser])
+
+    // console.log({ admin, loginUser })
+    // console.log("admin?.email", admin?.email)
 
     return (
         <Router>
             <NavBar />
             <Switch>
-                <Route exact path="/" component={Login} />
-                <Route path="/Signup" component={SignUp} />
-                <Route path="/Dashboard" component={Dashboard} />
-                <Route path="/forget" component={forgetPassword} />
-                <Route path="/showbookings" component={ShowBookings} />
-                {admin?.email === "admin@gmail.com" ?
-                    <> <Route exact path="/locations" component={Locations} />
-                        <Route exact path="/locations/:address" component={NewBookings} />
+                {!admin?.email && !loginUser?.email ?
+                    <>  <Route exact path="/" component={Login} />
+                        <Route path="/Signup" component={SignUp} />
+                        <Route path="/forget" component={forgetPassword} />
+                    </> : null
+                }
+                {Object.keys(admin).length > 0 && admin?.uid === "b6IparKn3BPnSDhUzuVyOhLqyuW2" ?
+                    <>
                         <Route path="/allusers" component={Allusers} />
                         <Route path="/allbookings" component={AllBookings} />
                         <Route path="/adminDashboard" component={AdminDashboard} />
                     </>
                     : <Route path="/notfound" render={() => <h1>Not Found</h1>} />
                 }
+                {loginUser?.email !== "admin@gmail.com" ?
+                    <>
+                        <Route path="/Dashboard" component={Dashboard} />
+                        <Route path="/showbookings" component={ShowBookings} />
+                        <Route exact path="/locations/:address" component={NewBookings} />
+                        <Route exact path="/locations" component={Locations} />
+                    </>
+                    : <Route path="/notfound" render={() => <h1>Not Found</h1>} />
+                }
+
             </Switch>
         </Router >
     )

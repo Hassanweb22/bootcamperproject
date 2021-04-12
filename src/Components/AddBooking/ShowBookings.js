@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Spinner } from "react-bootstrap"
 import firebase from "../firebase/index"
+import moment from "moment"
 import "./style.css"
 
 
@@ -10,8 +11,8 @@ function ShowBookings() {
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
+            if (user?.email !== "admin@gmail.com") {
+                firebase.database().ref("clients/").child(user?.uid).on("value", snapshot => {
                     console.log("ShowBookings userData FireBase", snapshot.val())
                     setcurrentUser(snapshot.val())
                     if (snapshot.val()?.bookings) {
@@ -26,7 +27,7 @@ function ShowBookings() {
             console.log("ShowBooking Unmounted")
         }
     }, [])
-    console.log({ currentUser })
+    // console.log({ currentUser })
 
     return (
         <div className="container my-5">
@@ -41,23 +42,26 @@ function ShowBookings() {
                     : <Table className="card_body rounded-4 text-center" responsive striped bordered hover>
                         <thead className="align-content-center thead-dark">
                             <tr className="text-capitalize">
-                                <th>Booking Id</th>
                                 <th>location</th>
                                 <th>slot no</th>
                                 <th>date</th>
                                 <th>Start Time</th>
                                 <th>End Time</th>
+                                <th>Total Time</th>
                             </tr>
                         </thead>
+                        {/* console.log("Time", {startTime: user.startTime, endTime: moment(date).add(2, "hours").format("H:mm") }) */}
                         <tbody className="bg-light">
-                            {Object.keys(bookings).map(show => {
-                                return <tr className="text-capitalize"  key={show}>
-                                    <td>{show}</td>
-                                    <td>{bookings[show].location}</td>
-                                    <td>{bookings[show].slots}</td>
-                                    <td>{bookings[show].userDate}</td>
-                                    <td>{bookings[show].startTime}</td>
-                                    <td>{bookings[show].endTime} Hours</td>
+                            {Object.keys(bookings).map(key => {
+                                let date = bookings[key].userDate + " " + bookings[key].startTime
+                                let Total_time = moment(date).add(2, "hours").format("H:mm")
+                                return <tr className="text-capitalize" key={key}>
+                                    <td>{bookings[key].location}</td>
+                                    <td>{bookings[key].slots}</td>
+                                    <td>{bookings[key].userDate}</td>
+                                    <td>{bookings[key].startTime}</td>
+                                    <td>{Total_time}</td>
+                                    <td>{bookings[key].endTime} Hours</td>
                                 </tr>
                             })}
                         </tbody>

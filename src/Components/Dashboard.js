@@ -15,7 +15,7 @@ export default function Dashboard() {
                     setcurrentUser(snapshot.val())
                 })
             } else {
-                console.log("No user Found", user?.uid)
+                console.log("No user Found", user)
             }
         });
         return () => console.log("Dashboard Unmounted")

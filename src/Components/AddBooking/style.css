@@ -25,7 +25,6 @@ h2.no_bookings {
   font-size: 20px;
 }
 
-
 .list-group-item svg {
   font-size: 45px;
   background-color: #17a2b8;
@@ -34,4 +33,39 @@ h2.no_bookings {
   font-weight: bold;
   cursor: pointer;
   /* width: 0%; */
+}
+
+.slots_Card {
+  height: 300px;
+  margin: 0 auto !important;
+}
+
+.slots_Card .card_body > div.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slots_Card .card_body h5 {
+  color: #17a2b8;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 7px 5px rgba(0, 0, 0, 0.3),
+    0px -4px 10px rgba(255, 255, 255, 0.3);
+}
+.slots_Card .card_body > div.row > div{
+  background-color: #17a2b8;
+  padding: 5px;
+  width: 150px !important;
+  height: 100px;
+  margin: 5px 5px !important;
+  border: 2px solid #17a2b8;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slots_Card .card_body > div.row > div >div{
+
 }

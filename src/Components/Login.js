@@ -20,7 +20,10 @@ export default function Login() {
     let { email, password } = state
 
     useEffect(() => {
-        console.log("isUserLogedIn", firebase.auth().currentUser)
+        // console.log("isUserLogedIn", firebase.auth().currentUser)
+        // firebase.database().ref("clients").orderByChild("email").on("value", snapshot => {
+        //     console.log("clients", snapshot.val())
+        // })
         return () => console.log("Login Component unmounted")
     }, [])
 
@@ -40,10 +43,21 @@ export default function Login() {
             .then(({ user }) => {
                 // var userInfo = userCredential.user;
                 if (user.email === "admin@gmail.com") {
-                    history.push("./adminDashboard")
+                    history.push("/adminDashboard")
                 }
                 else {
-                    history.push("./dashboard")
+                    firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
+                        if (snapshot.val() !== null) {
+                            if (!snapshot.val().block) {
+                                console.log("clients", snapshot.val()[user.uid])
+                                history.push("/dashboard")
+                            }
+                            else {
+                                alert("You are Blocked")
+                                firebase.auth().signOut()
+                            }
+                        }
+                    })
                 }
                 console.log("Loginuser", user)
                 setState(initialState)
