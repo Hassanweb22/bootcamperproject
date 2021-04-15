@@ -20,7 +20,6 @@ export default function Dashboard() {
         });
         return () => console.log("Dashboard Unmounted")
     }, [firebase.auth().currentUser])
-    console.log("dashboardUser", currentUser)
     return (
         <div>
             <div className="container">

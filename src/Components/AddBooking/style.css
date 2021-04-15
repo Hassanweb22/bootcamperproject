@@ -26,13 +26,18 @@ h2.no_bookings {
 }
 
 .list-group-item svg {
-  font-size: 45px;
+  font-size: 48px;
   background-color: #17a2b8;
-  border-radius: 40%;
-  padding: 5px;
+  border-radius: 50%;
+  border: 2px solid #454558;
+  padding: 6px;
   font-weight: bold;
   cursor: pointer;
-  /* width: 0%; */
+  transition: transform 0.3s ease;
+}
+
+.list-group-item svg:hover {
+  transform: scale(1.1);
 }
 
 .slots_Card {
@@ -53,19 +58,47 @@ h2.no_bookings {
   text-shadow: 2px 7px 5px rgba(0, 0, 0, 0.3),
     0px -4px 10px rgba(255, 255, 255, 0.3);
 }
-.slots_Card .card_body > div.row > div{
-  background-color: #17a2b8;
+.slots_Card .card_body > div.row > button {
+  /* background-color: #17a2b8; */
   padding: 5px;
-  width: 150px !important;
+  width: 140px !important;
   height: 100px;
   margin: 5px 5px !important;
-  border: 2px solid #17a2b8;
+  /* border: 2px solid #17a2b8; */
   border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+.slots_Card .card_body > div.row > button:active:focus {
+  box-shadow: 0 0 0 0.2rem rgb(222 170 12 / 50%);
+}
 
-.slots_Card .card_body > div.row > div >div{
+/* .slots_Card .card_body > div.row > div > div {
+} */
 
+.slots_nav {
+  display: flex;
+  justify-content: center;
+}
+.slots_nav button {
+  margin: 0 5px;
+}
+
+.showslotsTiming table tbody tr td.no_data {
+  font-size: 20px;
+}
+
+@media screen and (max-width: 480px) {
+  .showslotsTiming table tbody tr td.no_data {
+    font-size: 13px;
+  }
+}
+
+.btn:focus:active {
+  background-color: #19682c;
+}
+.btn:focus {
+  outline: 0;
+  box-shadow: none !important;
 }

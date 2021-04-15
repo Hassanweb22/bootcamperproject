@@ -28,7 +28,7 @@ export default function NavBar() {
     <>
       {/* <Nav.Link onClick={() => history.push("/dashboard")}>User Dashboard</Nav.Link> */}
       <Nav.Link onClick={() => history.push("/locations")}>Locations</Nav.Link>
-      <Nav.Link onClick={() => history.push("/showbookings")}>Show Bookings</Nav.Link>
+      <Nav.Link onClick={() => history.push("/showbookings")}>My Bookings</Nav.Link>
     </>
 
   const logoNav = (loginUser?.email === "admin@gmail.com") ?
