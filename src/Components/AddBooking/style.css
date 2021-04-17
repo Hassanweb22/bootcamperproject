@@ -70,8 +70,12 @@ h2.no_bookings {
   justify-content: center;
   align-items: center;
 }
-.slots_Card .card_body > div.row > button:active:focus {
-  box-shadow: 0 0 0 0.2rem rgb(222 170 12 / 50%);
+.slots_Card .card_body > div.row > button:active {
+  /* box-shadow: 0 0 0 0.2rem rgb(222 170 12 / 50%); */
+  border: 2px solid #1a1918 !important;
+}
+.slots_Card .card_body > div.row > button:focus {
+  border: 2px solid #f8f7f7 !important;
 }
 
 /* .slots_Card .card_body > div.row > div > div {

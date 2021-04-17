@@ -47,15 +47,15 @@ export default function Login() {
                     history.push("/adminDashboard")
                 }
                 else {
-                    firebase.database().ref("clients/").child(user.uid).once("value", snapshot => {
+                    firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
                         if (snapshot.val() !== null) {
                             if (!snapshot.val().block) {
                                 console.log("clients", snapshot.val()[user.uid])
                                 history.push("/dashboard")
                             }
                             else {
-                                alert("You have been Blocked")
                                 firebase.auth().signOut()
+                                alert("You have been Blocked")
                                 history.push("/")
 
                             }
