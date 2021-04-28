@@ -1,29 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Card, Alert } from "react-bootstrap"
-import { useHistory, Link } from 'react-router-dom'
+import { useHistory, Redirect, Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 import firebase from "../Components/firebase/index"
+import { addUser } from "../store/action/action"
 import "./style.css"
 
 export default function Login() {
     let history = useHistory()
+    const dispatch = useDispatch()
+    const name = useSelector(state => state.task)
     let initialState = {
         email: "",
         password: "",
     }
-    const [state, setState] = useState(initialState)
-    const [validationError, setvalidationError] = useState({
+    let initialErrors = {
         email: "",
         password: "",
         access: "",
-        block: ""
-    })
+        block: "",
+        connection: ""
+    }
+    const [state, setState] = useState(initialState)
+    const [validationError, setvalidationError] = useState(initialErrors)
 
     let { email, password } = state
 
     useEffect(() => {
         // console.log("isUserLogedIn", firebase.auth().currentUser)
         // firebase.database().ref("clients").orderByChild("email").on("value", snapshot => {
-        //     console.log("clients", snapshot.val())
+        // console.log("name", name)
         // })
         return () => console.log("Login Component unmounted")
     }, [])
@@ -34,56 +40,59 @@ export default function Login() {
             ...state,
             [name]: value,
         })
-        setvalidationError({ ...validationError, email: "", password: "", block: "", access: "" })
+        setvalidationError(initialErrors)
     }
     const handleSubmit = (e) => {
         e.preventDefault()
-        console.log("state", state)
-        setvalidationError(initialState)
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then(({ user }) => {
-                // var userInfo = userCredential.user;
-                if (user.email === "admin@gmail.com") {
-                    history.push("/adminDashboard")
-                }
-                else {
-                    firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
-                        if (snapshot.val() !== null) {
-                            if (!snapshot.val().block) {
-                                console.log("clients", snapshot.val()[user.uid])
-                                history.push("/dashboard")
-                            }
-                            else {
-                                firebase.auth().signOut()
-                                alert("You have been Blocked")
-                                history.push("/")
+        setvalidationError(initialErrors)
+        let ifBlock
+        firebase.database().ref("clients/").on("value", snapshot => {
+            // console.log("clients", snapshot.val())
+            Object.keys(snapshot.val()).filter(user => {
+                if (snapshot.val()[user].email === state.email && snapshot.val()[user].block) {
+                    ifBlock = snapshot.val()[user].email
+                    setvalidationError({ ...validationError, block: "You have been Blocked" })
+                    // firebase.auth().signOut()
 
-                            }
-                        }
-                    })
                 }
-                console.log("Loginuser", user)
-                setState(initialState)
-                setvalidationError(initialState)
             })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log({ errorCode, errorMessage })
-                if (error.code === "auth/user-not-found") {
-                    setvalidationError({ ...validationError, email: "User have not found or may Have deleted" })
-                    // window.alert(errorCode + "/n" + errorMessage)
-                }
-                else if (error.code === "auth/wrong-password") {
-                    setvalidationError({ ...validationError, password: "Password May not be Correct" })
-                }
-                else if (error.code === "auth/too-many-requests") {
-                    setvalidationError({ ...validationError, access: "Too many try, Now Access to this account has disabled" })
-                }
-                else {
+        })
+        if (!ifBlock) {
+            setvalidationError({ ...validationError, block: "" })
+            firebase.auth().signInWithEmailAndPassword(email, password)
+                .then(({ user }) => {
+                    if (user.email === "admin@gmail.com") {
+                        history.push("/adminDashboard")
+                    }
+                    else {
+                        history.push("/dashboard")
+                        console.log("Loginuser", user)
+                    }
+                    setState(initialState)
                     setvalidationError(initialState)
-                }
-            });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log({ errorCode, errorMessage })
+                    if (error.code === "auth/user-not-found") {
+                        setvalidationError({ ...validationError, email: "User have not found or may Have deleted" })
+                        // window.alert(errorCode + "/n" + errorMessage)
+                    }
+                    else if (error.code === "auth/wrong-password") {
+                        setvalidationError({ ...validationError, password: "Password is invalid" })
+                    }
+                    else if (error.code === "auth/too-many-requests") {
+                        setvalidationError({ ...validationError, access: "Too many try, Now Access to this account has been disabled" })
+                    }
+                    else if (error.code === "auth/network-request-failed") {
+                        setvalidationError({ ...validationError, connection: "Your Internet Connection has been disbaled" })
+                    }
+                    else {
+                        setvalidationError(initialState)
+                    }
+                });
+        }
     }
 
     let validate = () => (state.email && state.password) ? true : false
@@ -97,7 +106,7 @@ export default function Login() {
 
             <div className="row">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto py-3" style={{ width: '40rem' }}>
-                    {(validationError?.access) ? <Alert className="mt-3" variant={"danger"}>{validationError.access}</Alert> : null}
+                    {(validationError?.access || validationError?.connection) ? <Alert className="" variant="danger">{validationError.access || validationError?.connection}</Alert> : null}
                     <Form className="mb-3" onSubmit={handleSubmit}>
                         <Form.Group controlId="formTitle">
                             <Form.Label>Email</Form.Label>
@@ -106,7 +115,7 @@ export default function Login() {
                                 value={email}
                                 onChange={handleChange}
                             />
-                            <Form.Text className="text-danger">{validationError.email}</Form.Text>
+                            <Form.Text className="text-danger ml-1">{validationError.email || validationError.block}</Form.Text>
                         </Form.Group>
 
                         <Form.Group controlId="formDescription">

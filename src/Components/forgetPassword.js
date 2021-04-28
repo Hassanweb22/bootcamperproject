@@ -40,6 +40,7 @@ export default function Login() {
                 console.log(errorCode)
                 console.log(errorMessage)
                 window.alert("Message", errorMessage)
+                history.push("/")
             })
     }
 

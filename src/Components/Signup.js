@@ -7,7 +7,7 @@ import "./style.css"
 
 
 export default function SignUp() {
-    // const history = useHistory()
+    const history = useHistory()
     let initialState = {
         username: "",
         email: "",
@@ -38,14 +38,17 @@ export default function SignUp() {
 
     }
 
+    const titleCase = str => {
+        let str1 = str.toLowerCase()
+        return str1.replace(/(^|\s)\S/g, function (t) { return t.toUpperCase() });
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault()
         // console.log("state", state)
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(({ user }) => {
-                let obj = { username, email: user.email, key: user.uid, bookings: {} }
-                let adminObj = { username, email: user.email, key: user.uid }
-                console.log("Signupuser", user.uid)
+                let obj = { username: titleCase(username), email: user.email, key: user.uid, bookings: {} }
                 firebase.database().ref('clients/').child(user.uid).set(
                     obj,
                     err => {
@@ -53,17 +56,11 @@ export default function SignUp() {
                             console.log("error", err)
                         }
                     });
-                firebase.database().ref('admin/').child("users/").child(user.uid).set(
-                    obj,
-                    err => {
-                        if (err) {
-                            console.log("error", err)
-                        }
-                    });
                 console.log("SignUp-User", obj)
-                firebase.auth().signOut()
                 setState(initialState)
                 setvalidationError(initialState)
+                firebase.auth().signOut()
+                history.push("/")
             })
             .catch((error) => {
                 var errorCode = error.code;
@@ -73,7 +70,7 @@ export default function SignUp() {
                     setvalidationError({ ...validationError, email: "The Email is already been in use" })
                 }
                 else if (errorCode === "auth/weak-password") {
-                    setvalidationError({ ...validationError, password: "Password Must be greater than 6" })
+                    setvalidationError({ ...validationError, password: "Password should be at least 6 characters" })
                 }
             });
     }
@@ -115,6 +112,7 @@ export default function SignUp() {
                                 value={password}
                                 onChange={handleChange}
                             />
+                            {/* <Form.Text className="text-dark">Password Must be greater than 5</Form.Text> */}
                             <Form.Text className="text-danger">{validationError.password}</Form.Text>
                         </Form.Group>
                         <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>

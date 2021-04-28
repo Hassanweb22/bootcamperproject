@@ -1,0 +1,20 @@
+.allBookings {
+  height: 650px;
+  overflow: auto;
+  z-index: 0;
+}
+
+/* .allBookings table thead {
+  position: fixed;
+  z-index: 1;
+  margin-bottom: 20px;
+  width: 100%;
+} */
+
+/* .alert-success {
+  color: #38473c !important;
+  background-color: #23b946 !important;
+  border-color: #c3e6cb !important;
+  background-color: #20bf55;
+  background-image: linear-gradient(42deg, #20bf55 0%, #01baef 85%);
+} */

@@ -1,11 +1,22 @@
-import React from 'react';
-import { Card, ListGroup } from "react-bootstrap"
+import React, { useState, useEffect } from 'react';
+import { Card, ListGroup, Spinner } from "react-bootstrap"
 import { ArrowLeftCircleFill, ArrowRightCircleFill, ArrowBarRight } from "react-bootstrap-icons"
 import { useHistory } from "react-router-dom"
+import firebase from "../firebase/index"
 import "./style.css"
 
 function Locations() {
     const history = useHistory()
+    const [allLocations, setAllLocations] = useState({})
+
+    useEffect(() => {
+        firebase.database().ref("admin").child("locations").on("value", snapshot => {
+            // console.log("Firebase Locations", snapshot.val())
+            setAllLocations(snapshot.val())
+        })
+        // return () => console.log("Location Unmountedd")
+        // return () => console.log("")
+    }, [])
     return (
         <div className="container mt-4">
             <div className="users_heading">
@@ -15,16 +26,23 @@ function Locations() {
                     <ArrowRightCircleFill onClick={() => history.goForward()} style={{ fontWeight: "bold", cursor: "pointer" }} />
                 </h2>
             </div>
-            <Card>
-                <Card.Body >
-                    <p className="text-center text-dark">Select one of the following Locations for Parking</p>
-                    <ListGroup variant="flush">
-                        <ListGroup.Item><span>Malir</span><ArrowBarRight onClick={_ => history.push("/locations/malir")} /></ListGroup.Item>
-                        <ListGroup.Item><span>Bhadurabad</span> <ArrowBarRight onClick={_ => history.push("/locations/bhadurabad")} /></ListGroup.Item>
-                        <ListGroup.Item><span>Tower</span> <ArrowBarRight onClick={_ => history.push("/locations/tower")} /></ListGroup.Item>
-                    </ListGroup>
-                </Card.Body>
-            </Card>
+            {Object.keys(allLocations).length > 0 ?
+                <Card>
+                    <Card.Body >
+                        <p className="text-center text-dark">Select one of the following Locations for Parking</p>
+                        <ListGroup variant="flush">
+                            {Object.keys(allLocations).map(key => {
+                               return <ListGroup.Item key={key}><span>{allLocations[key].locationName}</span><ArrowBarRight onClick={_ => history.push(`/locations/${allLocations[key].locationName}/${allLocations[key].slots}`)} /></ListGroup.Item>
+                            })}
+                            {/* <ListGroup.Item><span>Bhadurabad</span> <ArrowBarRight onClick={_ => history.push("/locations/bhadurabad/6")} /></ListGroup.Item>
+                            <ListGroup.Item><span>Tower</span> <ArrowBarRight onClick={_ => history.push("/locations/tower/7")} /></ListGroup.Item> */}
+                        </ListGroup>
+                    </Card.Body>
+                </Card>
+                :
+                <div className="text-center mx-auto">
+                    <Spinner animation="border" size="lg" variant="primary" />
+                </div>}
         </div>
     )
 }

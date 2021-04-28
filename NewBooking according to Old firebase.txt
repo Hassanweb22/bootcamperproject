@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+ import React, { useState, useEffect } from 'react'
 import { Form, Button, Card, Row } from "react-bootstrap"
 import ShowSlotsTiming from './ShowSlotsTiming.js'
 import { useHistory, useParams, Link } from 'react-router-dom'
@@ -9,8 +9,8 @@ import { withRouter } from 'react-router-dom';
 import "../style.css"
 
 
-function NewBookings(props) {
-    const { address, totalSlots } = useParams()
+function NewBookings() {
+    const { address } = useParams()
     const history = useHistory()
     const momentRange = extendMoment(moment);
     let initialState = {
@@ -28,11 +28,9 @@ function NewBookings(props) {
     let [noOfSlots, setNoOfSlots] = useState([])
     let [showSlots, setShowSlots] = useState(false)
     let [slotsAvailablity, setSlotsAvailablity] = useState(false)
-    let [bookSlot, setBookSlot] = useState(false)
     let [error, setError] = useState({
         isAfter: "",
-        conflicit: "",
-        timeLimit: ""
+        conflicit: ""
     })
     let { location, slots, userDate, startTime, endTime } = state
 
@@ -44,12 +42,11 @@ function NewBookings(props) {
                     return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                 }
             })
-            setBookings(newArray)
             console.log("new array", newArray)
-            console.log({ address, totalSlots: parseInt(totalSlots) })
+            setBookings(newArray)
         })
 
-        setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
+        setNoOfSlots(Array(5).fill(1).map((x, y) => x + y))
         setShowSlots(false)
 
         return () => console.log("newbOOKING unmounted")
@@ -57,10 +54,12 @@ function NewBookings(props) {
 
     let checkSlot = () => {
         setShowSlots(true)
+        let endingTime = moment(userDate + " " + startTime).add(endTime, "hours")
+        let startToEnding = (userDate, startTime, endTime) => moment(userDate + " " + startTime).add(endTime, "hours")
         let date = () => bookings.filter((val, index) => {
             if (val.location == location && moment(userDate).isSame(val.userDate)) {
-                const date1 = [moment(userDate + " " + startTime), moment(userDate + " " + endTime)];
-                const date2 = [moment(val.userDate + " " + val.startTime), moment(val.userDate + " " + val.endTime)];
+                const date1 = [moment(userDate + " " + startTime), endingTime];
+                const date2 = [moment(val.userDate + " " + val.startTime), startToEnding(val.userDate, val.startTime, val.endTime)];
 
                 const range = momentRange.range(date1);
                 const range2 = momentRange.range(date2);
@@ -82,7 +81,7 @@ function NewBookings(props) {
         });
         if (date().length > 0) {
             console.log("date()", date())
-            let copySlots = Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y)
+            let copySlots = Array(5).fill(1).map((x, y) => x + y)
             let toRemove = []
             date().map(val => toRemove.push(parseInt(val.slots)))
             console.log("toremove IF", toRemove)
@@ -94,12 +93,8 @@ function NewBookings(props) {
         }
         else {
             console.log("noOfSlots Else", noOfSlots)
-            setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
+            setNoOfSlots(Array(5).fill(1).map((x, y) => x + y))
         }
-    }
-
-    const startTimeValidate = () => {
-        return userDate ? true : false
     }
 
     const handleChange = (e) => {
@@ -109,49 +104,39 @@ function NewBookings(props) {
             [name]: value,
         })
         setShowSlots(false)
+        // checkSlot()
         setSlotNo("")
-        setError({ isAfter: "", conflicit: "", timeLimit: "" })
+        setError("")
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
+        let totalTime =moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H:mm")
+        let bookingObj = { location, slots: slotNo, userDate, startTime, endTime, totalTime }
+        console.log("bookingObj", bookingObj)
+        // console.log("state", state)
         const { uid } = firebase.auth().currentUser
-        const totalTime = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H:mm")
-        const hours = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H")
-        const min = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("mm")
-        const add = moment(userDate + ' ' + startTime).add(hours, "hours").add(min, "minutes")
-
-        // console.log({ add, timeLimit })
-        let timeLimit = moment(userDate + " " + totalTime).isAfter(userDate + ' ' + "00:10")
-        let isAfter = add.isAfter(userDate + ' ' + "24:00");
+        let isAfter = moment(userDate + ' ' + startTime).add(endTime, "hours").isAfter(userDate + ' ' + "24:00");
         if (isAfter) {
             setError({ ...error, isAfter: "Time Should Not exceed 24 hours" })
-            console.log("isafter", isAfter, error.isAfter)
-        }
-        else if (!timeLimit) {
-            setError({ ...error, timeLimit: "Time duration must be greater than 10 Minutes" })
-            console.log("timeLimit", timeLimit, error.timeLimit)
+            console.log("isafter", isAfter, error)
         }
         else {
-            const key = firebase.database().ref(`clients/${uid}/`).child("bookings").push().key
-            let bookingObj = { bookingId: key, uid, location, slots: slotNo, userDate, startTime, endTime, totalTime }
-            console.log("bookingObj", bookingObj)
-            firebase.database().ref(`clients/${uid}/`).child("bookings").child(key).set(
-                bookingObj,
-                err => {
-                    if (err) {
-                        console.log("error", err)
-                    }
-                });
-            setState(initialState)
-            setSlotNo("")
+            // const key = firebase.database().ref("bookings").push().key
+            // let bookingObj = { bookingId: key, location, slots: slotNo, userDate, startTime, endTime }
+            // console.log("bookingObj", bookingObj)
+            // firebase.database().ref("bookings/").child(uid).child(key).set(
+            //     bookingObj,
+            //     err => {
+            //         if (err) {
+            //             console.log("error", err)
+            //         }
+            //     });
+            // setState(initialState)
         }
 
     }
 
-    let getMinimumTime = () => {
-        return moment
-    }
     let validate = () => (location && userDate && startTime && endTime && slotNo) ? true : false
     let slotsValidate = () => (userDate && startTime && endTime) ? true : false
 
@@ -185,20 +170,24 @@ function NewBookings(props) {
                         <Row>
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>Start Time</Form.Label>
-                                <Form.Control type="time" name="startTime"
-                                    value={startTime} min={moment().format("H:mm")}
-                                    disabled={!startTimeValidate()}
+                                <Form.Control type="time" name="startTime" value={startTime}
                                     onChange={handleChange}
                                 />
 
                             </Form.Group>
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>End Time (For)</Form.Label>
-                                <Form.Control type="time" name="endTime"
-                                    value={endTime}
+                                {/* <Form.Control as="select" name="endTime" value={endTime} onChange={handleChange}>
+                                    <option value="" className="font-weight-bold">Select Hours</option>
+                                    <option value="1">1 Hour</option>
+                                    <option value="2">2 Hour</option>
+                                    <option value="3">3 Hour</option>
+                                    <option value="4">4 Hour</option>
+                                </Form.Control> */}
+                                <Form.Control type="time" name="endTime" value={endTime}
                                     onChange={handleChange}
                                 />
-                                {error.isAfter || error.timeLimit ? <small className="text-danger">{error.isAfter || error.timeLimit}</small> : null}
+                                {error.isAfter ? <small className="text-danger">{error.isAfter}</small> : null}
                             </Form.Group>
                         </Row>
 
@@ -216,9 +205,8 @@ function NewBookings(props) {
                         </Row>
                         <div className="container">
                             <Row className="d-flex justify-content-around">
-                                {!bookSlot ? <Button type="button" className="col-md-5 col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
-                                    : <Button className="col-md-6 col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
-                                }
+                                <Button type="button" className="col-md-5 col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
+                                <Button className="col-md-6 col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
                             </Row>
                         </div>
                     </Form>

@@ -12,12 +12,6 @@ function AllBookings() {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 setcurrentUser(user)
-                // firebase.database().ref("admin/").child("users").on("value", snapshot => {
-                //     console.log("Admin_AllBookings_FireBase", snapshot.val())
-                //     if (snapshot.val() !== null) {
-                //         setAllUsers(snapshot.val())
-                //     }
-                // })
                 firebase.database().ref("clients/").on("value", snapshot => {
                     console.log("Admin_AllBookings_FireBase", snapshot.val())
                     if (snapshot.val() !== null) {
@@ -51,7 +45,7 @@ function AllBookings() {
                     <div className="text-center mx-auto">
                         <h2 className="no_bookings">No Users Yet</h2>
                     </div>
-                    : <Table className="card_body text-capitalize text-center" responsive striped bordered hover>
+                    : <Table className="card_body text-center" responsive striped bordered hover>
                         <thead className="align-content-center thead-dark">
                             <tr className="text-capitalize">
                                 {/* <th>Users ID</th> */}
@@ -64,7 +58,7 @@ function AllBookings() {
                             {allUsers.map(user => {
                                 return <tr key={user.key}>
                                     {/* <td>{key}</td> */}
-                                    <td>{user.username}</td>
+                                    <td className="text-capitalize">{user.username}</td>
                                     <td>{user.email}</td>
                                     <td><Block item={user} block={user.block} id={user.key} size="sm" variant="danger" /></td>
                                 </tr>

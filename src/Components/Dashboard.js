@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Row, Col, Button } from "react-bootstrap"
-import { useHistory } from "react-router-dom"
+import { Card, Row, Col, Button, Spinner } from "react-bootstrap"
+import { useHistory, withRouter } from "react-router-dom"
 import firebase from '../Components/firebase/index'
 
-export default function Dashboard() {
+function Dashboard() {
     let history = useHistory()
     const [currentUser, setcurrentUser] = useState({})
 
@@ -15,7 +15,7 @@ export default function Dashboard() {
                     setcurrentUser(snapshot.val())
                 })
             } else {
-                console.log("No user Found", user)
+                setcurrentUser({})
             }
         });
         return () => console.log("Dashboard Unmounted")
@@ -33,15 +33,9 @@ export default function Dashboard() {
                             <Card.Title className="text-center text-capitalize font-italic text-info"
                                 style={{ fontSize: 25 }}
                             >Welcome Dear ! {currentUser ? currentUser?.username : "User"}</Card.Title>
-                            <Row>
-                                {/* {!fire.auth().currentUser?.uid ? */}
-                                {/* <Card.Text className="text-center mx-auto font-weight-bold">You can Add New Bookings </Card.Text>
-                                <Card.Text className="text-center mx-auto font-weight-bold">You can Check Your Bookings <br /></Card.Text> */}
-                                {/* } */}
-                            </Row>
                             < Row className="mt-3">
                                 <Col className="text-center">
-                                    <Button className=" rounded-5 px-4 py-2" variant="success"
+                                    <Button className="rounded-5 px-4 py-2 mb-0 mb-2 mb-md-0 mb-lg-0" variant="success"
                                         onClick={() => history.push("/locations")}>Show Locations</Button>
 
                                     <Button className="rounded-5 mx-3 px-4 py-2" variant="success"
@@ -55,3 +49,5 @@ export default function Dashboard() {
         </div >
     )
 }
+
+export default withRouter(Dashboard);

@@ -22,7 +22,6 @@ function ShowSlotsTiming({ bookings, address, userDate }) {
                 <thead className="align-content-center thead-dark">
                     <tr className="text-capitalize">
                         <th>slot no</th>
-                        <th>location</th>
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>Total Time</th>
@@ -30,14 +29,14 @@ function ShowSlotsTiming({ bookings, address, userDate }) {
                 </thead>
                 <tbody className="bg-light">
                     {currentLocation.length > 0 ? currentLocation.map((data, index) => {
-                        let date = moment(data.userDate + " " + data.startTime)
-                        let Total_time = moment(date).add(data.endTime, "hours").format("h:mm a")
+                        let startTime = moment(data.userDate + " " + data.startTime)
+                        let endTime = moment(data.userDate + " " + data.endTime)
+                        // let Total_time = moment(date).add(data.endTime, "hours").format("h:mm a")
                         return <tr className="text-capitalize" key={data.bookingId} >
                             <td>{data.slots}</td>
-                            <td>{data.location}</td>
-                            <td>{date.format("h:mm a")}</td>
-                            <td>{Total_time}</td>
-                            <td>{data.endTime} Hour</td>
+                            <td>{startTime.format("h:mm a")}</td>
+                            <td>{endTime.format("h:mm a")}</td>
+                            <td>{data.totalTime}</td>
                         </tr>
                     }) :
                         <tr>

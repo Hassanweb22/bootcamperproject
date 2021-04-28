@@ -46,10 +46,11 @@ export default function AdminNav() {
                             <> <Nav.Link onClick={() => history.push("./admindashboard")}>Admin Dashboard</Nav.Link>
                                 <Nav.Link onClick={() => history.push("./allusers")}>All Users</Nav.Link>
                                 <Nav.Link onClick={() => history.push("./allbookings")}>All Bookings</Nav.Link>
+                                <Nav.Link onClick={() => history.push("./addlocations")}>Add Locations</Nav.Link>
+                                <Nav.Link onClick={() => history.push("./viewLocations")}>View Loations</Nav.Link>
                             </>}
                     </Nav>
                     <Form inline>
-                        <Form.Control type="text" placeholder="Search" className="mr-sm-2" />
                         {/* <Button variant="info" size="" onClick={() => console.log("currentUser", firebase.auth().currentUser)}>user</Button> */}
                         <span className="mt-2 mt-md-0 mt-lg-0">{ admin ?
                             <Button className="btn btn-block" variant="info" size="" onClick={signOut}>Logout</Button>

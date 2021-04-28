@@ -3,25 +3,27 @@ import { Table, Spinner } from "react-bootstrap"
 import { ArrowLeftCircleFill, ArrowRight, ArrowRightCircleFill } from "react-bootstrap-icons"
 import firebase from "../firebase/index"
 import moment from "moment"
-import { useHistory } from "react-router-dom"
+import { useHistory, withRouter } from "react-router-dom"
 import "./style.css"
 
 
 function ShowBookings() {
     const history = useHistory()
     const [bookings, setBookings] = useState({})
+    const [currentUser, setCurrentUser] = useState({})
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user !== null && user?.email !== "admin@gmail.com") {
                 firebase.database().ref("clients/").child(user?.uid).on("value", snapshot => {
                     console.log("ShowBookings userData FireBase", snapshot.val())
+                    setCurrentUser(snapshot.val())
                     if (snapshot.val()?.bookings) {
                         setBookings(snapshot.val()?.bookings)
                     }
                 })
             } else {
-                console.log("No user Found", user)
+                setCurrentUser({})
             }
         });
         return () => {
@@ -31,7 +33,7 @@ function ShowBookings() {
     // console.log({ currentUser })
 
     return (
-        <div className="container my-5">
+        <div className="container my-5" >
             <div className="users_heading">
                 <h2 className="text-center text-capitalize" >
                     <ArrowLeftCircleFill onClick={() => history.goBack()} style={{ fontWeight: "bold", cursor: "pointer" }} />
@@ -59,16 +61,17 @@ function ShowBookings() {
                         {/* console.log("Time", {startTime: user.startTime, endTime: moment(date).add(2, "hours").format("H:mm") }) */}
                         <tbody className="bg-light">
                             {Object.keys(bookings).map((key, index) => {
-                                let date = moment(bookings[key].userDate + " " + bookings[key].startTime)
-                                let Total_time = moment(date).add(bookings[key].endTime, "hours").format("h:mm a")
+                                let startTime = moment(bookings[key].userDate + " " + bookings[key].startTime)
+                                let endTime = moment(bookings[key].userDate + " " + bookings[key].endTime)
+                                // let Total_time = moment(date).add(bookings[key].endTime, "hours").format("h:mm a")
                                 return <tr className="text-capitalize" key={key}>
                                     <td>{index + 1}</td>
                                     <td>{bookings[key].location}</td>
                                     <td>{bookings[key].slots}</td>
                                     <td>{bookings[key].userDate}</td>
-                                    <td>{date.format("h:mm a")}</td>
-                                    <td>{Total_time}</td>
-                                    <td>{bookings[key].endTime} Hours</td>
+                                    <td>{startTime.format("h:mm a")}</td>
+                                    <td>{endTime.format("h:mm a")}</td>
+                                    <td>{bookings[key].totalTime} Hours</td>
                                 </tr>
                             })}
                         </tbody>
@@ -78,4 +81,4 @@ function ShowBookings() {
     )
 }
 
-export default ShowBookings
+export default withRouter(ShowBookings)

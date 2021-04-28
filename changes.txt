@@ -1,0 +1,9 @@
+1.admin can add new locations
+2.disable the time which has been passed for the current date.
+3.end time should be like start time dropdown. (done)
+4.In signup username should in titleCase (done)
+5.booked slots button should be change with link (done)
+6.remove search bar (done)
+7.private routing issue
+8.fix blocking message (half done)
+9.fix email capitalize (done)
