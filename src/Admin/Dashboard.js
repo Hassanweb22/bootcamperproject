@@ -34,15 +34,9 @@ export default function Dashboard() {
                             <Card.Title className="text-center text-capitalize font-italic text-info"
                                 style={{ fontSize: 25 }}
                             >Welcome Dear ! {admin?.username}</Card.Title>
-                            <Row>
-                                {/* {!fire.auth().currentUser?.uid ? */}
-                                {/* <Card.Text className="text-center mx-auto font-weight-bold">You can Add New Bookings </Card.Text>
-                                <Card.Text className="text-center mx-auto font-weight-bold">You can Check Your Bookings <br /></Card.Text> */}
-                                {/* } */}
-                            </Row>
                             < Row className="mt-3">
                                 <Col className="text-center">
-                                    <Button className=" rounded-5 px-4 py-2" variant="success"
+                                    <Button className=" rounded-5 px-4 py-2 mb-0 mb-2 mb-md-0 mb-lg-0" variant="success"
                                         onClick={() => history.push("./allusers")}>All Users</Button>
 
                                     <Button className="rounded-5 mx-3 px-4 py-2" variant="success"

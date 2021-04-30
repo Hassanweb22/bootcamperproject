@@ -70,25 +70,32 @@ h2.no_bookings {
   text-shadow: 2px 7px 5px rgba(0, 0, 0, 0.3),
     0px -4px 10px rgba(255, 255, 255, 0.3);
 }
+
 .slots_Card .card_body > div.row > button {
   /* background-color: #17a2b8; */
   padding: 5px;
-  width: 140px !important;
-  height: 100px;
-  margin: 5px 5px !important;
+  width: 125px !important;
+  height: 93px;
+  margin: 7px 8px !important;
   /* border: 2px solid #17a2b8; */
   border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .slots_Card .card_body > div.row > button:active {
   /* box-shadow: 0 0 0 0.2rem rgb(222 170 12 / 50%); */
   border: 2px solid #1a1918 !important;
 }
 .slots_Card .card_body > div.row > button:focus {
-  border: 2px solid #f8f7f7 !important;
-  background-color: #1d212485;
+  border: 2px solid #343a40 !important;
+  background-color: #17a2b8 !important;
+}
+
+.slots_Card .card_body > div.row > button.buttonActive {
+  border: 2px solid #343a40 !important;
+  background-color: #17a2b8 !important;
 }
 
 /* .slots_Card .card_body > div.row > div > div {
@@ -97,7 +104,7 @@ h2.no_bookings {
 .slots_nav {
   display: flex;
   justify-content: center;
-  /* align-items: center; */
+  align-items: center;
 }
 .slots_nav small {
   font-size: 16px;
@@ -105,7 +112,7 @@ h2.no_bookings {
 }
 
 .slots_nav small span {
-  color: rgb(253, 61, 61);
+  color: #dae0e5 !important;
   cursor: pointer;
 }
 .slots_nav button {
@@ -117,10 +124,24 @@ h2.no_bookings {
     font-size: 14px;
   }
 }
+
+.bottom_card{
+    background-color: #343a40 !important;
+}
+
+
 @media screen and (max-width: 480px) {
   .select {
     font-size: 14px;
   }
+}
+
+.showslotsTiming{
+  /* background-color: #2c383a; */
+}
+
+.showslotsTiming .table-responsive{
+  height: 250px !important;
 }
 
 .showslotsTiming table tbody tr td.no_data {

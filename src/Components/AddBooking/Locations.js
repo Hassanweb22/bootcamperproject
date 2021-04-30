@@ -32,7 +32,12 @@ function Locations() {
                         <p className="text-center text-dark">Select one of the following Locations for Parking</p>
                         <ListGroup variant="flush">
                             {Object.keys(allLocations).map(key => {
-                               return <ListGroup.Item key={key}><span>{allLocations[key].locationName}</span><ArrowBarRight onClick={_ => history.push(`/locations/${allLocations[key].locationName}/${allLocations[key].slots}`)} /></ListGroup.Item>
+                                return <ListGroup.Item key={key}>
+                                    <span>{allLocations[key].locationName}<br />
+                                        {/* <span>SLots: {allLocations[key].slots}</span> */}
+                                    </span>
+                                    <ArrowBarRight onClick={_ => history.push(`/locations/${allLocations[key].locationName}/${allLocations[key].slots}`)} />
+                                </ListGroup.Item>
                             })}
                             {/* <ListGroup.Item><span>Bhadurabad</span> <ArrowBarRight onClick={_ => history.push("/locations/bhadurabad/6")} /></ListGroup.Item>
                             <ListGroup.Item><span>Tower</span> <ArrowBarRight onClick={_ => history.push("/locations/tower/7")} /></ListGroup.Item> */}

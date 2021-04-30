@@ -46,21 +46,19 @@ export default function Routes() {
         return () => console.log("something has removed")
     }, [firebase.auth().currentUser])
 
-    // console.log({ admin, loginUser })
-    // console.log("admin?.email", admin?.email)
 
     return (
         <Router>
             <NavBar />
             <Switch>
                 {!admin?.email && !loginUser?.email ?
-                    <>  <Route exact path="/" component={Login} />
+                    <>  <Route restricted={true} exact path="/" component={Login} isAuth={isAuth}/>
                         <Route path="/Signup" component={SignUp} />
                         <Route path="/forget" component={forgetPassword} />
                     </>
                     : null
                 }
-                {Object.keys(admin).length > 0 && admin?.uid === "b6IparKn3BPnSDhUzuVyOhLqyuW2" ?
+                {Object.keys(admin).length > 0 ?
                     <>
                         <Route path="/allusers" component={Allusers} />
                         <Route path="/allbookings" component={AllBookings} />
@@ -70,15 +68,17 @@ export default function Routes() {
                     </>
                     : <Route path="/notfound" render={() => <h1>Not Found</h1>} />
                 }
-                {loginUser?.email !== "admin@gmail.com" ?
-                    <>
-                <Route path="/Dashboard" component={Dashboard} isAuth={isAuth} />
-                <Route path="/showbookings" component={ShowBookings} isAuth={isAuth} />
-                <Route exact path="/locations/:address/:totalSlots" component={NewBookings} isAuth={isAuth} />
-                <Route exact path="/locations" component={Locations} isAuth={isAuth} />
-                </>
+                {/* {Object.keys(loginUser).length > 0 ?
+                    <> */}
+                        <Route path="/Dashboard" restricted={false} component={Dashboard} isAuth={isAuth} />
+                        <Route path="/showbookings" restricted={false} component={ShowBookings} isAuth={isAuth} />
+                        <Route exact path="/locations/:address/:totalSlots" restricted={false} component={NewBookings} isAuth={isAuth} />
+                        <Route exact path="/locations" restricted={false} component={Locations} isAuth={isAuth} />
+                    {/* </>
                     : null
-                }
+                } */}
+                <Route path="*" render={() => <h1>Not Found</h1>} />
+                <Redirect to="/dashboard" />
 
             </Switch>
         </Router >

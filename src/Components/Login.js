@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Card, Alert } from "react-bootstrap"
+import { Envelope, Eye, EyeSlash } from "react-bootstrap-icons"
 import { useHistory, Redirect, Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import firebase from "../Components/firebase/index"
@@ -22,6 +23,7 @@ export default function Login() {
         connection: ""
     }
     const [state, setState] = useState(initialState)
+    const [showPassword, setShowPassword] = useState(true)
     const [validationError, setvalidationError] = useState(initialErrors)
 
     let { email, password } = state
@@ -108,24 +110,32 @@ export default function Login() {
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto py-3" style={{ width: '40rem' }}>
                     {(validationError?.access || validationError?.connection) ? <Alert className="" variant="danger">{validationError.access || validationError?.connection}</Alert> : null}
                     <Form className="mb-3" onSubmit={handleSubmit}>
-                        <Form.Group controlId="formTitle">
-                            <Form.Label>Email</Form.Label>
+                        <Form.Group className="input-group" controlId="formTitle">
+                            <Form.Label className="d-block w-100">Email</Form.Label>
                             <Form.Control className={validationError.email ? "is-invalid" : ""} type="email" placeholder="Enter Email"
                                 name="email"
                                 value={email}
                                 onChange={handleChange}
                             />
-                            <Form.Text className="text-danger ml-1">{validationError.email || validationError.block}</Form.Text>
+                            <div className="input-group-text">
+                                <Envelope />
+                            </div>
+                            <Form.Text className="text-danger ml-1 w-100">{validationError.email || validationError.block}</Form.Text>
                         </Form.Group>
 
-                        <Form.Group controlId="formDescription">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control className={validationError.password ? "is-invalid" : ""} type="password" placeholder="Password"
+                        <Form.Group className="input-group" controlId="formDescription">
+                            <Form.Label className="d-block w-100">Password</Form.Label>
+                            <Form.Control className={validationError.password ? "is-invalid" : ""} placeholder="Password"
+                                type={showPassword ? "password" : "text"}
                                 name="password"
                                 value={password}
                                 onChange={handleChange}
                             />
-                            <Form.Text className="text-danger">{validationError.password}</Form.Text>
+                            <div className="input-group-text">
+                                {showPassword ? <EyeSlash onClick={() => setShowPassword(false)} />
+                                    : <Eye onClick={() => setShowPassword(true)} />}
+                            </div>
+                            <Form.Text className="text-danger w-100">{validationError.password}</Form.Text>
                         </Form.Group>
                         <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
                     </Form>

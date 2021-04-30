@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Spinner } from "react-bootstrap"
+import { Table, Spinner, Container, Row, Form, Button } from "react-bootstrap"
 import firebase from "../Components/firebase/index"
 import moment from "moment"
 import './style.css';
+import { EmojiSmileUpsideDown } from 'react-bootstrap-icons';
 
 
 function AllBookings() {
-    const [bookings, setBookings] = useState({})
+    const initialState = {
+        sort: "",
+        address: ""
+    }
+    const [state, setState] = useState(initialState)
+    const [bookings, setBookings] = useState([])
     const [newArray, setnewArray] = useState([])
-    const [currentUser, setcurrentUser] = useState({})
+    const [allLocations, setAllLocations] = useState([])
+
+    const { sort, address } = state
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
@@ -16,22 +24,87 @@ function AllBookings() {
                 let newArray = []
                 firebase.database().ref("clients/").on("value", snapshot => {
                     console.log("AllBookings userData FireBase", snapshot.val())
-                    let bookings = Object.keys(snapshot.val()).map(user => {
+                    Object.keys(snapshot.val()).map(user => {
                         if (snapshot.val()[user].hasOwnProperty('bookings') === true) {
                             return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                         }
                     })
+                    newArray = newArray.sort((a, b) => (moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD')))
                     setnewArray(newArray)
+                    setBookings(newArray)
+                    let location = newArray.map(a => a.location).filter((v, i, a) => a.indexOf(v) === i);
+                    setAllLocations(location)
+                    // .sort((a, b) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm')
+                    let time = []
+                    for (let i = 0; i < newArray.length; i++) {
+                        if (newArray[i]?.location === newArray[i + 1]?.location) {
+                            time.push(newArray[i]?.location)
+                        }
+                    }
+                    console.log({ time })
                 })
             } else {
                 console.log("No user Found", user?.uid)
             }
+            // firebase.database().ref("admin").child("locations").on("value", snapshot => {
+            //     // console.log("Firebase Locations", snapshot.val())
+            //     setAllLocations(snapshot.val())
+            // })
         });
         return () => {
             console.log("AllBooking Unmounted")
         }
     }, [])
     console.log({ newArray })
+
+    const sortBy = () => {
+        if (sort === "date") {
+            let array = [...newArray]
+            array.sort((a, b) => moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD'))
+            setnewArray(array)
+        }
+        else if (sort === "time") {
+            let array = [...newArray]
+            array.sort((a, b) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm'))
+            setnewArray(array)
+        }
+        else if (sort === "slot") {
+            let array = [...newArray]
+            array.sort((a, b) => a.slots - b.slots)
+            setnewArray(array)
+        }
+        else {
+            setnewArray(bookings)
+        }
+    }
+
+    const filterBy = () => {
+        if (address) {
+            let array = [...bookings]
+            array = array.filter(data => data.location == address)
+            console.log("arrayFilter", array)
+            setnewArray(array)
+        }
+        // else{
+        //     setnewArray(bookings)
+        // }
+        // sortBy()
+    }
+
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setState({
+            ...state,
+            [name]: value
+        })
+        console.log({ sort, address })
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        sortBy()
+        console.log("locations", allLocations)
+    }
 
     return (
         <div className="container my-5">
@@ -44,6 +117,41 @@ function AllBookings() {
                         <Spinner animation="border" size="lg" variant="primary" />
                     </div>
                     : <div className="col-lg-12 col-12 allBookings">
+                        <Container>
+                            <Form className="row" onSubmit={handleSubmit}>
+                                <Form.Group className="text-capitalize col-md-3 " controlId="exampleForm.ControlSelect1">
+                                    {/* <Form.Label>Sorting</Form.Label> */}
+                                    <Form.Control as="select" name="address"
+                                        value={address}
+                                        onChange={handleChange}>
+                                        <option value="">Select Location</option>
+                                        {allLocations.map(loc => {
+                                            return <option key={loc} value={loc}>{loc}</option>
+                                        })}
+                                    </Form.Control>
+                                </Form.Group>
+                                <Form.Group className="col-md-3">
+                                    <Button className="w-100" variant="primary"
+                                        disabled={!address}
+                                        onClick={() => filterBy()}>Filter</Button>
+                                </Form.Group>
+                                <Form.Group className="text-capitalize col-md-3 " controlId="exampleForm.ControlSelect1">
+                                    {/* <Form.Label>Sorting</Form.Label> */}
+                                    <Form.Control as="select" name="sort"
+                                        value={sort}
+                                        onChange={handleChange}>
+                                        <option value="">Select Sort</option>
+                                        <option value="date">Sort by Date</option>
+                                        <option value="time">sort by time</option>
+                                        <option value="slot">sort by slot</option>
+                                    </Form.Control>
+                                </Form.Group>
+                                <Form.Group className="col-md-3">
+                                    <Button className="w-100" variant="primary" type="submit">Sort</Button>
+                                </Form.Group>
+                            </Form>
+                        </Container>
+
                         <Table size={window.innerWidth < 500 ? "sm" : "md"} className="text-capitalize card_body rounded-4 text-center" responsive striped bordered hover>
                             <thead className="align-content-center thead-dark">
                                 <tr>
@@ -68,7 +176,7 @@ function AllBookings() {
                                         <td>{user.userDate}</td>
                                         <td>{startTime.format("h:mm a")}</td>
                                         <td>{endTime.format("h:mm a")}</td>
-                                        <td>{user.totalTime} Hours</td>
+                                        <td>{user.totalTime}</td>
                                     </tr>
                                 })}
                             </tbody>

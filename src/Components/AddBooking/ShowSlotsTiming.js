@@ -16,7 +16,7 @@ function ShowSlotsTiming({ bookings, address, userDate }) {
     return (
         <div className="showslotsTiming">
             <div className="d-flex justify-content-end">
-                <p className="text-danger">{userDate}</p>
+                <p style={{ color: "#35dcb8" }}>{userDate}</p>
             </div>
             <Table className="card_body rounded-4 text-center" size="sm" responsive striped bordered hover>
                 <thead className="align-content-center thead-dark">

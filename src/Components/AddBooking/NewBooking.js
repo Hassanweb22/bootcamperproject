@@ -21,6 +21,11 @@ function NewBookings(props) {
         endTime: "",
         slots: undefined
     }
+    let inititialErrors = {
+        isAfter: "",
+        conflicit: "",
+        timeLimit: ""
+    }
 
     const [state, setState] = useState(initialState)
     const [slotNo, setSlotNo] = useState("")
@@ -29,11 +34,7 @@ function NewBookings(props) {
     let [showSlots, setShowSlots] = useState(false)
     let [slotsAvailablity, setSlotsAvailablity] = useState(false)
     let [bookSlot, setBookSlot] = useState(false)
-    let [error, setError] = useState({
-        isAfter: "",
-        conflicit: "",
-        timeLimit: ""
-    })
+    let [error, setError] = useState(inititialErrors)
     let { location, slots, userDate, startTime, endTime } = state
 
     useEffect(() => {
@@ -45,12 +46,12 @@ function NewBookings(props) {
                 }
             })
             setBookings(newArray)
-            console.log("new array", newArray)
-            console.log({ address, totalSlots: parseInt(totalSlots) })
+            // console.log("new array", newArray)
+            // console.log({ address, totalSlots: parseInt(totalSlots) })
         })
 
         setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
-        setShowSlots(false)
+        // setShowSlots(false)
 
         return () => console.log("newbOOKING unmounted")
     }, [])
@@ -109,8 +110,9 @@ function NewBookings(props) {
             [name]: value,
         })
         setShowSlots(false)
+        setBookSlot(false)
         setSlotNo("")
-        setError({ isAfter: "", conflicit: "", timeLimit: "" })
+        setError(inititialErrors)
     }
 
     const handleSubmit = (e) => {
@@ -121,7 +123,6 @@ function NewBookings(props) {
         const min = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("mm")
         const add = moment(userDate + ' ' + startTime).add(hours, "hours").add(min, "minutes")
 
-        // console.log({ add, timeLimit })
         let timeLimit = moment(userDate + " " + totalTime).isAfter(userDate + ' ' + "00:10")
         let isAfter = add.isAfter(userDate + ' ' + "24:00");
         if (isAfter) {
@@ -133,6 +134,7 @@ function NewBookings(props) {
             console.log("timeLimit", timeLimit, error.timeLimit)
         }
         else {
+            setBookSlot(false)
             const key = firebase.database().ref(`clients/${uid}/`).child("bookings").push().key
             let bookingObj = { bookingId: key, uid, location, slots: slotNo, userDate, startTime, endTime, totalTime }
             console.log("bookingObj", bookingObj)
@@ -145,6 +147,7 @@ function NewBookings(props) {
                 });
             setState(initialState)
             setSlotNo("")
+            setSlotsAvailablity(false)
         }
 
     }
@@ -186,7 +189,8 @@ function NewBookings(props) {
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>Start Time</Form.Label>
                                 <Form.Control type="time" name="startTime"
-                                    value={startTime} min={moment().format("H:mm")}
+                                    value={startTime}
+                                    min={userDate == moment().format("YYYY-MM-DD") ? moment().format("H:mm") : ""}
                                     disabled={!startTimeValidate()}
                                     onChange={handleChange}
                                 />
@@ -202,22 +206,18 @@ function NewBookings(props) {
                             </Form.Group>
                         </Row>
 
-                        <Row>
+                        {/* <Row>
                             <Form.Group className="col-md-12" controlId="exampleForm.dateTime">
                                 <Form.Label>Slot No:</Form.Label>
                                 <Form.Control disabled={true} name="slotNo"
                                     value={slotNo}>
-                                    {/* <option value="" className="font-weight-bold">Select</option>
-                                    {noOfSlots.map(value => {
-                                        return <option key={value} value={value}>{value}</option>
-                                    })} */}
                                 </Form.Control>
                             </Form.Group>
-                        </Row>
+                        </Row> */}
                         <div className="container">
                             <Row className="d-flex justify-content-around">
-                                {!bookSlot ? <Button type="button" className="col-md-5 col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
-                                    : <Button className="col-md-6 col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
+                                {!bookSlot ? <Button type="button" className="col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { setBookSlot(true); checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
+                                    : <Button className="col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
                                 }
                             </Row>
                         </div>
@@ -225,24 +225,23 @@ function NewBookings(props) {
                 </Card>
             </div>
 
-            <div className="row my-3 slots_Card">
-                <Card className="container-fluid card_body col-lg-12 col-sm-12 col-md-12 col-12 mx-auto p-3" >
+            <div className="row my-3 slots_Card mb-4" style={{ marginBottom: "20px !important" }}>
+                <Card className="container-fluid card_body bottom_card col-lg-12 col-sm-12 col-md-12 col-12 mx-auto p-3" >
                     <div className="slots_nav">
-                        {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Booked" : "Available"} Slots of this Date: {userDate} <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>Click Here</span></small>}
-                        {/* <Button variant="success" onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>{!slotsAvailablity ? "Booked" : "Available"} Slots</Button> */}
+                        {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Booked" : "Available"} Slots of this Date: {userDate} <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>&nbsp; Click Here</span></small>}
                     </div>
                     {slotsAvailablity ?
                         <ShowSlotsTiming userDate={state.userDate} address={address} bookings={bookings} />
                         : showSlots ?
                             <>
-                                <p className="text-center text-info mt-2 select">Select any one of the folllowing</p>
+                                <p className="text-center text-info mt-2 select">Select any one of the folllowing Available Slots</p>
                                 <Row className="text-center">
                                     {noOfSlots.map(slot => {
-                                        return <Button variant="warning" onClick={() => setSlotNo(slot)} key={slot}>{slot}</Button>
+                                        return <Button className={`${slotNo === slot ? "buttonActive" : ""} `} variant="warning" onClick={() => setSlotNo(slot)} key={slot}>{slot}</Button>
                                     })}
-                                    <p className=" d-block mt-2 text-danger">{error.conflicit} </p>
+                                    <p className="w-100 d-block mt-2" style={{ color: "white" }}>{error.conflicit} </p>
                                 </Row>
-                            </> : <p className="text-center my-5">Press (Show Slots) Button After filling all fields To see available Slots</p>
+                            </> : <p className="text-center my-auto" style={{ color: "white" }}>Press (Show Slots) Button After filling all fields To see available Slots</p>
                     }
                 </Card>
             </div >

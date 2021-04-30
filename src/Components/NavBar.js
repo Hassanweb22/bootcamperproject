@@ -42,7 +42,7 @@ export default function NavBar() {
       onClick={() => history.push(!firebase.auth().currentUser ? "/" : "/admindashboard")}><img src={parkingApp} width="90" height="55" />
     </Navbar.Brand>
     : <Navbar.Brand style={{ cursor: "pointer" }}
-      onClick={() => history.push(!firebase.auth().currentUser ? "/" : "/dashboard")}><img src={parkingApp} width="90" height="55" />
+      onClick={() => history.push(!firebase.auth().currentUser ? "/" : "/dashboard")}><img src={parkingApp} width="85" height="50" />
     </Navbar.Brand>
 
   const signOut = () => {

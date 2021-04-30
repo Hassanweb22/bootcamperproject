@@ -71,7 +71,7 @@ function ShowBookings() {
                                     <td>{bookings[key].userDate}</td>
                                     <td>{startTime.format("h:mm a")}</td>
                                     <td>{endTime.format("h:mm a")}</td>
-                                    <td>{bookings[key].totalTime} Hours</td>
+                                    <td>{bookings[key].totalTime}</td>
                                 </tr>
                             })}
                         </tbody>

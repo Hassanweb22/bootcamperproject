@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Card } from "react-bootstrap"
+import { Envelope, Eye, EyeSlash } from "react-bootstrap-icons"
 import { useHistory } from 'react-router-dom'
 import firebase from "../Components/firebase/index"
 import { Link } from "react-router-dom"
@@ -11,6 +12,7 @@ export default function Login() {
         email: ""
     }
     const [state, setState] = useState(initialState)
+    const [showPassword, setShowPassword] = useState(false)
 
     let { email } = state
 
@@ -56,8 +58,11 @@ export default function Login() {
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto" style={{ width: '40rem' }}>
                     <Form className="my-3" onSubmit={handleSubmit}>
 
-                        <Form.Group controlId="formTitle">
-                            <Form.Label>Email</Form.Label>
+                        <Form.Group className="input-group" controlId="formTitle">
+                        <Form.Label className="d-block w-100">Email</Form.Label>
+                            <div className="input-group-text">
+                                <Envelope />
+                            </div>
                             <Form.Control type="email" placeholder="Enter Email"
                                 name="email"
                                 value={email}

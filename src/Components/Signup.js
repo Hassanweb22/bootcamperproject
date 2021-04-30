@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Card, Alert, Spinner } from "react-bootstrap"
+import { Envelope, Eye, EyeSlash, Window } from "react-bootstrap-icons"
 import { useHistory, Link } from 'react-router-dom'
 // import { X } from "react-bootstrap-icons"
 import firebase from "../Components/firebase/index.js"
@@ -14,6 +15,7 @@ export default function SignUp() {
         password: "",
     }
     const [state, setState] = useState(initialState)
+    const [showPassword, setShowPassword] = useState(true)
     const [validationError, setvalidationError] = useState({
         email: "",
         password: "",
@@ -86,34 +88,45 @@ export default function SignUp() {
             <div className="row show">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
 
-                    < Form className="my-3" onSubmit={handleSubmit}>
-                        <Form.Group controlId="formUsername">
-                            <Form.Label>Username</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Username"
+                    <Form className="my-3" onSubmit={handleSubmit}>
+                        <Form.Group className="input-group" controlId="formUsername">
+                            <Form.Label className="d-block w-100">Username</Form.Label>
+                            <Form.Control className="text-secondary" type="text" placeholder="Enter Username"
                                 name="username"
                                 value={username}
                                 onChange={handleChange}
                             />
-                            <Form.Text className="text-danger">{validationError.usernmae}</Form.Text>
+                            <div className="input-group-text">
+                                <Window />
+                            </div>
+                            <Form.Text className="text-danger w-100">{validationError.usernmae}</Form.Text>
                         </Form.Group>
-                        <Form.Group controlId="formEmail">
-                            <Form.Label>Email</Form.Label>
-                            <Form.Control className={validationError.email ? "is-invalid" : ""} type="email" placeholder="Enter Email"
+                        <Form.Group className="input-group" controlId="formEmail">
+                            <Form.Label className="d-block w-100">Email</Form.Label>
+                            <Form.Control className={`${validationError.email ? "is-invalid" : ""} text-secondary`} type="email" placeholder="Enter Email"
                                 name="email"
                                 value={email}
                                 onChange={handleChange}
                             />
-                            <Form.Text className="text-danger">{validationError.email}</Form.Text>
+                            <div className="input-group-text">
+                                <Envelope />
+                            </div>
+                            <Form.Text className="text-danger w-100">{validationError.email}</Form.Text>
                         </Form.Group>
-                        <Form.Group controlId="formPassword">
-                            <Form.Label>Password</Form.Label>
-                            <Form.Control className={validationError.password ? "is-invalid" : ""} type="password" placeholder="Password"
+                        <Form.Group className="input-group" controlId="formPassword">
+                            <Form.Label className="d-block w-100">Password</Form.Label>
+                            <Form.Control className={`${validationError.password ? "is-invalid" : ""} text-secondary`} placeholder="Password"
+                                type={showPassword ? "password" : "text"}
                                 name="password"
                                 value={password}
                                 onChange={handleChange}
                             />
+                            <div className="input-group-text">
+                                {showPassword ? <EyeSlash onClick={() => setShowPassword(false)} />
+                                    : <Eye onClick={() => setShowPassword(true)} />}
+                            </div>
                             {/* <Form.Text className="text-dark">Password Must be greater than 5</Form.Text> */}
-                            <Form.Text className="text-danger">{validationError.password}</Form.Text>
+                            <Form.Text className="text-danger w-100">{validationError.password}</Form.Text>
                         </Form.Group>
                         <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
                     </Form>
