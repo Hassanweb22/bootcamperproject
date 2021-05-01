@@ -78,7 +78,7 @@ export default function Routes() {
                     : null
                 } */}
                 <Route path="*" render={() => <h1>Not Found</h1>} />
-                <Redirect to="/dashboard" />
+                {/* <Redirect to="/dashboard" /> */}
 
             </Switch>
         </Router >

@@ -21,27 +21,19 @@ function AllBookings() {
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                let newArray = []
                 firebase.database().ref("clients/").on("value", snapshot => {
+                    let newArray = []
                     console.log("AllBookings userData FireBase", snapshot.val())
                     Object.keys(snapshot.val()).map(user => {
                         if (snapshot.val()[user].hasOwnProperty('bookings') === true) {
                             return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                         }
                     })
-                    newArray = newArray.sort((a, b) => (moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD')))
+                    // newArray = newArray.sort((a, b) => (moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD')))
                     setnewArray(newArray)
                     setBookings(newArray)
                     let location = newArray.map(a => a.location).filter((v, i, a) => a.indexOf(v) === i);
                     setAllLocations(location)
-                    // .sort((a, b) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm')
-                    let time = []
-                    for (let i = 0; i < newArray.length; i++) {
-                        if (newArray[i]?.location === newArray[i + 1]?.location) {
-                            time.push(newArray[i]?.location)
-                        }
-                    }
-                    console.log({ time })
                 })
             } else {
                 console.log("No user Found", user?.uid)
@@ -58,14 +50,34 @@ function AllBookings() {
     console.log({ newArray })
 
     const sortBy = () => {
-        if (sort === "date") {
-            let array = [...newArray]
-            array.sort((a, b) => moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD'))
+        if (sort === "datetime") {
+            let array = [...newArray];
+            array = array.sort((a, b) => {
+                return new Date(b.userDate).getTime() - new Date(a.userDate).getTime()
+            });
+            array = array.sort((a, b) => {
+                if (new Date(a.userDate).getTime() === new Date(b.userDate).getTime()) {
+                    if (Number(b.startTime.split(":")[0]) < Number(a.startTime.split(":")[0])) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                }
+                else {
+                    return 0
+                }
+            });
+
             setnewArray(array)
         }
         else if (sort === "time") {
             let array = [...newArray]
-            array.sort((a, b) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm'))
+            array.sort((b, a) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm'))
+            setnewArray(array)
+        }
+        else if (sort === "time") {
+            let array = [...newArray]
+            array = array.sort((a, b) => (moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD')))
             setnewArray(array)
         }
         else if (sort === "slot") {
@@ -141,9 +153,10 @@ function AllBookings() {
                                         value={sort}
                                         onChange={handleChange}>
                                         <option value="">Select Sort</option>
-                                        <option value="date">Sort by Date</option>
-                                        <option value="time">sort by time</option>
-                                        <option value="slot">sort by slot</option>
+                                        <option value="date">by Date</option>
+                                        <option value="time">by time</option>
+                                        <option value="datetime">by Date Time</option>
+                                        <option value="slot">by slot</option>
                                     </Form.Control>
                                 </Form.Group>
                                 <Form.Group className="col-md-3">

@@ -132,8 +132,8 @@ export default function Login() {
                                 onChange={handleChange}
                             />
                             <div className="input-group-text">
-                                {showPassword ? <EyeSlash onClick={() => setShowPassword(false)} />
-                                    : <Eye onClick={() => setShowPassword(true)} />}
+                                {showPassword ? <Eye onClick={() => setShowPassword(false)} />
+                                    : <EyeSlash onClick={() => setShowPassword(true)} />}
                             </div>
                             <Form.Text className="text-danger w-100">{validationError.password}</Form.Text>
                         </Form.Group>

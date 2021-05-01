@@ -7,6 +7,6 @@
 7.private routing issue
 8.fix blocking message (half done)
 9.fix email capitalize (done)
-10.admin can see booking in sorted from
+10.admin can see booking in sorted from (half done)
 11.internet disables error at login page (done)
 12.after forget-password and signup user should redirect at login (done)
