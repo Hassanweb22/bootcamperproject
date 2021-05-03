@@ -9,7 +9,7 @@ function ShowSlotsTiming({ bookings, address, userDate }) {
     useEffect(() => {
         // console.log("ShowSlotsTiming Bookings", bookings, address, userDate)
         let location = bookings.filter(data => data.location === address && data.userDate === userDate)
-        console.log("currentLocation", location)
+        // console.log("currentLocation", location)
         setCurrentLocation(location)
         return () => console.log("ShowSlotsTiming Unmounted")
     }, [userDate, bookings])

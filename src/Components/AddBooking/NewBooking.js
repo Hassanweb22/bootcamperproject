@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button, Card, Row } from "react-bootstrap"
+import { Form, Button, Card, Row, Alert } from "react-bootstrap"
 import ShowSlotsTiming from './ShowSlotsTiming.js'
-import { useHistory, useParams, Link } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import firebase from "../firebase/index.js"
 import moment from "moment"
 import { extendMoment } from 'moment-range';
@@ -34,20 +34,19 @@ function NewBookings(props) {
     let [showSlots, setShowSlots] = useState(false)
     let [slotsAvailablity, setSlotsAvailablity] = useState(false)
     let [bookSlot, setBookSlot] = useState(false)
+    const [success, setSuccess] = useState(false)
     let [error, setError] = useState(inititialErrors)
     let { location, slots, userDate, startTime, endTime } = state
 
     useEffect(() => {
         firebase.database().ref("clients/").on("value", snapshot => {
             let newArray = []
-            let bookings = Object.keys(snapshot.val()).map(user => {
+            Object.keys(snapshot.val()).map(user => {
                 if (snapshot.val()[user].hasOwnProperty('bookings')) {
                     return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                 }
             })
             setBookings(newArray)
-            // console.log("new array", newArray)
-            // console.log({ address, totalSlots: parseInt(totalSlots) })
         })
 
         setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
@@ -81,8 +80,8 @@ function NewBookings(props) {
                 }
             }
         });
+        console.log("date()", date())
         if (date().length > 0) {
-            console.log("date()", date())
             let copySlots = Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y)
             let toRemove = []
             date().map(val => toRemove.push(parseInt(val.slots)))
@@ -144,6 +143,12 @@ function NewBookings(props) {
                     if (err) {
                         console.log("error", err)
                     }
+                    else {
+                        setSuccess(true)
+                        setTimeout(() => {
+                            setSuccess(false)
+                        }, 5000);
+                    }
                 });
             setState(initialState)
             setSlotNo("")
@@ -203,6 +208,8 @@ function NewBookings(props) {
                                     onChange={handleChange}
                                 />
                                 {error.isAfter || error.timeLimit ? <small className="text-danger">{error.isAfter || error.timeLimit}</small> : null}
+                                {success ? <small className="text-success font-weight-bold">Booking added Successfully</small> : null}
+
                             </Form.Group>
                         </Row>
 

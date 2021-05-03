@@ -3,7 +3,6 @@ import { Table, Spinner, Container, Row, Form, Button } from "react-bootstrap"
 import firebase from "../Components/firebase/index"
 import moment from "moment"
 import './style.css';
-import { EmojiSmileUpsideDown } from 'react-bootstrap-icons';
 
 
 function AllBookings() {
@@ -36,7 +35,7 @@ function AllBookings() {
                     setAllLocations(location)
                 })
             } else {
-                console.log("No user Found", user?.uid)
+                return false
             }
             // firebase.database().ref("admin").child("locations").on("value", snapshot => {
             //     // console.log("Firebase Locations", snapshot.val())
@@ -49,35 +48,43 @@ function AllBookings() {
     }, [])
     console.log({ newArray })
 
+    const dateTime = () => {
+        let array = [...newArray];
+        array = array.sort((a, b) => {
+            return new Date(b.userDate).getTime() - new Date(a.userDate).getTime()
+        });
+        console.log("time", array)
+        array = array.sort((a, b) => {
+            if (new Date(a.userDate).getTime() === new Date(b.userDate).getTime()) {
+                if (Number(b.startTime.split(":")[0]) < Number(a.startTime.split(":")[0])) {
+                    return 1
+                } else {
+                    return -1
+                }
+            }
+            else {
+                return 0
+            }
+        });
+
+        setnewArray(array)
+    }
+
     const sortBy = () => {
         if (sort === "datetime") {
-            let array = [...newArray];
+            dateTime()
+        }
+        else if (sort === "date") {
+            let array = [...newArray]
+            // array = array.sort((a, b) => (moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD')))
             array = array.sort((a, b) => {
                 return new Date(b.userDate).getTime() - new Date(a.userDate).getTime()
             });
-            array = array.sort((a, b) => {
-                if (new Date(a.userDate).getTime() === new Date(b.userDate).getTime()) {
-                    if (Number(b.startTime.split(":")[0]) < Number(a.startTime.split(":")[0])) {
-                        return 1
-                    } else {
-                        return -1
-                    }
-                }
-                else {
-                    return 0
-                }
-            });
-
             setnewArray(array)
         }
         else if (sort === "time") {
             let array = [...newArray]
             array.sort((b, a) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm'))
-            setnewArray(array)
-        }
-        else if (sort === "time") {
-            let array = [...newArray]
-            array = array.sort((a, b) => (moment(b.userDate).format('YYYYMMDD') - moment(a.userDate).format('YYYYMMDD')))
             setnewArray(array)
         }
         else if (sort === "slot") {
@@ -92,15 +99,37 @@ function AllBookings() {
 
     const filterBy = () => {
         if (address) {
-            let array = [...bookings]
-            array = array.filter(data => data.location == address)
-            console.log("arrayFilter", array)
-            setnewArray(array)
+            if (address == "all") {
+                let array = [...bookings]
+                // array = array.sort((a, b) => (moment(b.userDate).format('YYYY-MM-DD') - moment(a.userDate).format('YYYY-MM-DD')))
+                setnewArray(array)
+            }
+            else {
+                let array = [...bookings]
+                array = array.sort((a, b) => {
+                    return new Date(b.userDate).getTime() - new Date(a.userDate).getTime()
+                });
+                array = array.sort((a, b) => {
+                    if (new Date(a.userDate).getTime() === new Date(b.userDate).getTime()) {
+                        if (Number(b.startTime.split(":")[0]) < Number(a.startTime.split(":")[0])) {
+                            return 1
+                        } else {
+                            return -1
+                        }
+                    }
+                    else {
+                        return 0
+                    }
+                });
+                array = array.filter(data => data.location == address)
+                console.log("arrayFilter", array)
+                setnewArray(array)
+            }
         }
-        // else{
-        //     setnewArray(bookings)
-        // }
-        // sortBy()
+        else {
+            setnewArray(bookings)
+        }
+        // console.log({ address })
     }
 
     const handleChange = (e) => {
@@ -109,13 +138,12 @@ function AllBookings() {
             ...state,
             [name]: value
         })
-        console.log({ sort, address })
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
         sortBy()
-        console.log("locations", allLocations)
+        // console.log({ address, sort})
     }
 
     return (
@@ -135,8 +163,9 @@ function AllBookings() {
                                     {/* <Form.Label>Sorting</Form.Label> */}
                                     <Form.Control as="select" name="address"
                                         value={address}
-                                        onChange={handleChange}>
+                                        onChange={(e) => handleChange(e)}>
                                         <option value="">Select Location</option>
+                                        <option value="all">All Locations</option>
                                         {allLocations.map(loc => {
                                             return <option key={loc} value={loc}>{loc}</option>
                                         })}
@@ -151,7 +180,7 @@ function AllBookings() {
                                     {/* <Form.Label>Sorting</Form.Label> */}
                                     <Form.Control as="select" name="sort"
                                         value={sort}
-                                        onChange={handleChange}>
+                                        onChange={(e) => handleChange(e)}>
                                         <option value="">Select Sort</option>
                                         <option value="date">by Date</option>
                                         <option value="time">by time</option>

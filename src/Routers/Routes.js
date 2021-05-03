@@ -14,9 +14,9 @@ import AddLocations from '../Admin/AddLocations';
 import ViewLocations from '../Admin/ViewLocations';
 import firebase from "../Components/firebase/index"
 import NavBar from '../Components/NavBar';
-import PrivateRoutes from "./PrivateRoute"
-import LoginRoutes from "./LoginRoutes"
-import { useSelector, useDispatch } from "react-redux"
+// import PrivateRoutes from "./PrivateRoute"
+// import LoginRoutes from "./LoginRoutes"
+// import { useSelector, useDispatch } from "react-redux"
 
 export default function Routes() {
     // const currentState = useSelector(state => state.task)
@@ -27,7 +27,8 @@ export default function Routes() {
     useEffect(() => {
         firebase.auth().onAuthStateChanged((user) => {
             // console.log("user", user)
-            if (user !== null) {
+            if (!!user) {
+                localStorage.setItem('loginUser', JSON.stringify(user));
                 if (user?.email === "admin@gmail.com") {
                     setAdmin(user)
                 }
@@ -42,7 +43,7 @@ export default function Routes() {
                 setLoginUser({})
             }
         })
-        // console.log("currentState", currentState)
+        console.log("currentState", JSON.parse(localStorage.getItem("loginUser")))
         return () => console.log("something has removed")
     }, [firebase.auth().currentUser])
 
@@ -51,35 +52,32 @@ export default function Routes() {
         <Router>
             <NavBar />
             <Switch>
+                <Route exact path="/" component={Login} />
                 {!admin?.email && !loginUser?.email ?
-                    <>  <Route restricted={true} exact path="/" component={Login} isAuth={isAuth}/>
-                        <Route path="/Signup" component={SignUp} />
-                        <Route path="/forget" component={forgetPassword} />
+                    <>  <Route exact path="/" component={Login} />
+                        <Route exact path="/Signup" component={SignUp} />
+                        <Route exact path="/forget" component={forgetPassword} />
                     </>
                     : null
                 }
                 {Object.keys(admin).length > 0 ?
                     <>
-                        <Route path="/allusers" component={Allusers} />
-                        <Route path="/allbookings" component={AllBookings} />
-                        <Route path="/adminDashboard" component={AdminDashboard} />
-                        <Route path="/viewlocations" component={ViewLocations} />
-                        <Route path="/addlocations" component={AddLocations} />
+                        <Route exact path="/allusers" component={Allusers} />
+                        <Route exact path="/allbookings" component={AllBookings} />
+                        <Route exact path="/adminDashboard" component={AdminDashboard} />
+                        <Route exact path="/viewlocations" component={ViewLocations} />
+                        <Route exact path="/addlocations" component={AddLocations} />
                     </>
-                    : <Route path="/notfound" render={() => <h1>Not Found</h1>} />
+                    : <Route exact path="/notfound" render={() => <h1>Not Found</h1>} />
                 }
-                {/* {Object.keys(loginUser).length > 0 ?
-                    <> */}
-                        <Route path="/Dashboard" restricted={false} component={Dashboard} isAuth={isAuth} />
-                        <Route path="/showbookings" restricted={false} component={ShowBookings} isAuth={isAuth} />
-                        <Route exact path="/locations/:address/:totalSlots" restricted={false} component={NewBookings} isAuth={isAuth} />
-                        <Route exact path="/locations" restricted={false} component={Locations} isAuth={isAuth} />
-                    {/* </>
-                    : null
-                } */}
-                <Route path="*" render={() => <h1>Not Found</h1>} />
-                {/* <Redirect to="/dashboard" /> */}
-
+                {Object.keys(loginUser).length > 0 ?
+                    <>
+                        <Route exact path="/dashboard" component={Dashboard} />
+                        <Route exact path="/showbookings" component={ShowBookings} />
+                        <Route exact path="/locations/:address/:totalSlots" component={NewBookings} />
+                        <Route exact path="/locations" component={Locations} />
+                    </>
+                    : null}
             </Switch>
         </Router >
     )

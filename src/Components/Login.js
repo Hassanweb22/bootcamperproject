@@ -29,10 +29,7 @@ export default function Login() {
     let { email, password } = state
 
     useEffect(() => {
-        // console.log("isUserLogedIn", firebase.auth().currentUser)
-        // firebase.database().ref("clients").orderByChild("email").on("value", snapshot => {
-        // console.log("name", name)
-        // })
+      
         return () => console.log("Login Component unmounted")
     }, [])
 
@@ -55,7 +52,6 @@ export default function Login() {
                     ifBlock = snapshot.val()[user].email
                     setvalidationError({ ...validationError, block: "You have been Blocked" })
                     // firebase.auth().signOut()
-
                 }
             })
         })

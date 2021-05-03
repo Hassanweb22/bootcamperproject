@@ -2,32 +2,20 @@ import React, { useState, useEffect } from "react";
 import { Route, Redirect } from "react-router-dom";
 import firebase from "../Components/firebase/index"
 
-const PrivateRoute = ({ isAuth: isAuth, restricted, component: Component, ...rest }) => {
-
-  useEffect(() => {
-    firebase.auth().onAuthStateChanged()
-    return () => console.log("Private routes has removed")
-  }, [])
-
+const PrivateRoute = ({ component: Component, ...rest }) => {
+  const user = JSON.parse(localStorage.getItem("loginUser")) ? Object.keys(JSON.parse(localStorage.getItem("loginUser"))).length : null;
+  console.log(JSON.parse(localStorage.getItem("loginUser")), " user privated");
   return (
-    // <Route
-    //   {...rest}
-    //   render={props => {
-    //     return (!Object.keys(loginUser).length > 0) ? (
-    //       <Component {...props} />
-    //     ) : (
-    //       <Redirect to={{ pathname: "/", state: { from: props.location } }} />
-    //     );
-    //   }}
-    // />
-    <Route {...rest} render={(props) => {
-      return (isAuth === true && restricted) ? (
-        // <Redirect to="/dashboard" />
-        <Component {...props} />
-      ) : (
-        <Redirect to="/" />
-      );
-    }} />
+    <Route
+      {...rest}
+      render={props => {
+        return (user) ? (
+          <Component {...props} />
+        ) : (
+          <Redirect to="/" />
+        );
+      }}
+    />
   );
 };
 

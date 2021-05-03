@@ -47,6 +47,7 @@ export default function NavBar() {
 
   const signOut = () => {
     firebase.auth().signOut()
+    localStorage.removeItem("loginUser")
     dispatch(removeUser())
     history.push("/")
     console.log("LogOut")

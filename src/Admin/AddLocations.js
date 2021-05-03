@@ -87,7 +87,7 @@ function AddLocations() {
             <div className="row">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto py-3" style={{ width: '40rem' }}>
                     {/* {(validationError?.access || validationError?.connection) ? <Alert className="" variant="danger">{validationError.access || validationError?.connection}</Alert> : null} */}
-                    {success ? <Alert className="" variant="success">Location added Succefully</Alert> : null}
+                    {success ? <Alert className="" variant="success">Location added Successfully</Alert> : null}
                     <Form className="mb-3" onSubmit={handleSubmit}>
                         <Form.Group controlId="formTitle">
                             <Form.Label className="ml-1">Location</Form.Label>
