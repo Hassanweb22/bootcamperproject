@@ -17,6 +17,7 @@ function NewBookings(props) {
         username: "",
         location: address,
         userDate: "",
+        endDate: "",
         startTime: "",
         endTime: "",
         slots: undefined
@@ -34,9 +35,10 @@ function NewBookings(props) {
     let [showSlots, setShowSlots] = useState(false)
     let [slotsAvailablity, setSlotsAvailablity] = useState(false)
     let [bookSlot, setBookSlot] = useState(false)
+    let [passData, setPassData] = useState([])
     const [success, setSuccess] = useState(false)
     let [error, setError] = useState(inititialErrors)
-    let { location, slots, userDate, startTime, endTime } = state
+    let { location, slots, userDate, endDate, startTime, endTime } = state
 
     useEffect(() => {
         firebase.database().ref("clients/").on("value", snapshot => {
@@ -46,6 +48,7 @@ function NewBookings(props) {
                     return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                 }
             })
+            console.log("newArray", newArray)
             setBookings(newArray)
         })
 
@@ -55,46 +58,81 @@ function NewBookings(props) {
         return () => console.log("newbOOKING unmounted")
     }, [])
 
+
+    const add = () => {
+        const hours = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H")
+        const min = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("mm")
+        return moment(userDate + ' ' + startTime).add(hours, "hours").add(min, "minutes")
+    }
+
+    const totalTimeArr = () => {
+        const hour = moment.utc(moment(endDate + " " + endTime).diff(moment(userDate + " " + startTime), "hours"))._i
+        const getDays = moment.utc(moment(endDate + " " + endTime).diff(moment(userDate + " " + startTime), "days"))._i
+        const getHours = moment.utc(moment(endDate + " " + endTime).diff(moment(userDate + " " + startTime), "hours"))._i - (getDays * 24)
+        const getMinutes = moment.utc(moment(endDate + " " + endTime).diff(moment(userDate + " " + startTime), "minutes"))._i - (hour * 60)
+        return [getDays, getHours, getMinutes]
+    }
+
     let checkSlot = () => {
-        setShowSlots(true)
-        let date = () => bookings.filter((val, index) => {
-            if (val.location == location && moment(userDate).isSame(val.userDate)) {
-                const date1 = [moment(userDate + " " + startTime), moment(userDate + " " + endTime)];
-                const date2 = [moment(val.userDate + " " + val.startTime), moment(val.userDate + " " + val.endTime)];
+        console.log(state)
+        const totalTime = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H:mm")
 
-                const range = momentRange.range(date1);
-                const range2 = momentRange.range(date2);
+        console.log("totalTime", add())
+        console.log("TotalTimeArr", totalTimeArr())
 
-                // has overlapping
-                if (range.overlaps(range2)) {
-                    console.log("overlaps completely")
-                    if ((range2.contains(range, true) || range.contains(range2, true)) && !date1[0].isSame(date2[0])) {
-                        setError({ ...error, conflicit: `Some Slots are missing bcz Your Time range completely conflict at it` });
-                        return true
-                    }
-                    else {
-                        console.log("overlaps partially")
-                        setError({ ...error, conflicit: `Some Slots are missing bcz Your Time range partially conflict at it` });
-                        return true
-                    }
-                }
-            }
-        });
-        console.log("date()", date())
-        if (date().length > 0) {
-            let copySlots = Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y)
-            let toRemove = []
-            date().map(val => toRemove.push(parseInt(val.slots)))
-            console.log("toremove IF", toRemove)
-            copySlots = copySlots.filter(val => !toRemove.includes(val))
-            console.log("nofslots IF", copySlots)
-            setNoOfSlots(copySlots);
-
-            // setNoOfSlots(noOfSlots.filter(no => no !== val.slots))
+        let timeLimit = userDate == endDate ? moment(userDate + " " + totalTime).isAfter(userDate + ' ' + "00:10") : true
+        let isAfter = userDate == endDate ? add().isAfter(userDate + ' ' + "23:59") : false;
+        if (isAfter) {
+            setError({ ...error, isAfter: "Time Should Not exceed 24 hours" })
+            console.log("isafter", isAfter, error.isAfter)
+        }
+        else if (!timeLimit) {
+            setError({ ...error, timeLimit: "Time duration must be greater than 10 Minutes" })
+            console.log("timeLimit", timeLimit, error.timeLimit)
         }
         else {
-            console.log("noOfSlots Else", noOfSlots)
-            setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
+            setShowSlots(true)
+            setBookSlot(true)
+            let date = () => bookings.filter((val, index) => {
+                if (val.location == location) {
+                    const date1 = [moment(userDate + " " + startTime), moment(endDate + " " + endTime)];
+                    const date2 = [moment(val.userDate + " " + val.startTime), moment(val.endDate + " " + val.endTime)];
+
+                    const range = momentRange.range(date1);
+                    const range2 = momentRange.range(date2);
+
+                    // has overlapping
+                    if (range.overlaps(range2)) {
+                        console.log("overlaps completely")
+                        if ((range2.contains(range, true) || range.contains(range2, true)) && !date1[0].isSame(date2[0])) {
+                            setError({ ...error, conflicit: `Some Slots are missing bcz Your Time range completely conflict at it` });
+                            return true
+                        }
+                        else {
+                            console.log("overlaps partially")
+                            setError({ ...error, conflicit: `Some Slots are missing bcz Your Time range partially conflict at it` });
+                            return true
+                        }
+                    }
+                }
+            });
+            console.log("date()", date())
+            setPassData(date())
+            if (date().length > 0) {
+                let copySlots = Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y)
+                let toRemove = []
+                date().map(val => toRemove.push(parseInt(val.slots)))
+                console.log("toremove IF", toRemove)
+                copySlots = copySlots.filter(val => !toRemove.includes(val))
+                console.log("nofslots IF", copySlots)
+                setNoOfSlots(copySlots);
+
+                // setNoOfSlots(noOfSlots.filter(no => no !== val.slots))
+            }
+            else {
+                console.log("noOfSlots Else", noOfSlots)
+                setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
+            }
         }
     }
 
@@ -118,42 +156,33 @@ function NewBookings(props) {
         e.preventDefault()
         const { uid } = firebase.auth().currentUser
         const totalTime = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H:mm")
-        const hours = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H")
-        const min = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("mm")
-        const add = moment(userDate + ' ' + startTime).add(hours, "hours").add(min, "minutes")
 
-        let timeLimit = moment(userDate + " " + totalTime).isAfter(userDate + ' ' + "00:10")
-        let isAfter = add.isAfter(userDate + ' ' + "24:00");
-        if (isAfter) {
-            setError({ ...error, isAfter: "Time Should Not exceed 24 hours" })
-            console.log("isafter", isAfter, error.isAfter)
+        // console.log({ error })
+
+        setBookSlot(false)
+        const key = firebase.database().ref(`clients/${uid}/`).child("bookings").push().key
+        let bookingObj = {
+            bookingId: key, slots: slotNo, timeDuration: totalTimeArr(),
+            uid, location, userDate, startTime, endDate, endTime
         }
-        else if (!timeLimit) {
-            setError({ ...error, timeLimit: "Time duration must be greater than 10 Minutes" })
-            console.log("timeLimit", timeLimit, error.timeLimit)
-        }
-        else {
-            setBookSlot(false)
-            const key = firebase.database().ref(`clients/${uid}/`).child("bookings").push().key
-            let bookingObj = { bookingId: key, uid, location, slots: slotNo, userDate, startTime, endTime, totalTime }
-            console.log("bookingObj", bookingObj)
-            firebase.database().ref(`clients/${uid}/`).child("bookings").child(key).set(
-                bookingObj,
-                err => {
-                    if (err) {
-                        console.log("error", err)
-                    }
-                    else {
-                        setSuccess(true)
-                        setTimeout(() => {
-                            setSuccess(false)
-                        }, 5000);
-                    }
-                });
-            setState(initialState)
-            setSlotNo("")
-            setSlotsAvailablity(false)
-        }
+        console.log("bookingObj", bookingObj)
+        firebase.database().ref(`clients/${uid}/`).child("bookings").child(key).set(
+            bookingObj,
+            err => {
+                if (err) {
+                    console.log("error", err)
+                }
+                else {
+                    setSuccess(true)
+                    setTimeout(() => {
+                        setSuccess(false)
+                    }, 5000);
+                }
+            });
+        setState(initialState)
+        setSlotNo("")
+        setShowSlots(false)
+        setSlotsAvailablity(false)
 
     }
 
@@ -175,22 +204,23 @@ function NewBookings(props) {
             <div className="row show">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
                     <Form className="my-3" onSubmit={handleSubmit}>
-                        <Row>
-                            <Form.Group className="col-md-6 col-12">
+                        {/* <Row>
+                            <Form.Group className=" col-12">
                                 <Form.Label>Select Location</Form.Label>
                                 <Form.Control className="text-capitalize" name="location"
                                     disabled
                                     value={address}>
                                 </Form.Control>
                             </Form.Group>
+                        </Row> */}
+
+                        <Row>
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>Date</Form.Label>
+                                <Form.Label>Start Date</Form.Label>
                                 <Form.Control type="date" min={moment().format("YYYY-MM-DD")} name="userDate" value={userDate}
                                     onChange={handleChange} />
                             </Form.Group>
-                        </Row>
 
-                        <Row>
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>Start Time</Form.Label>
                                 <Form.Control type="time" name="startTime"
@@ -201,9 +231,21 @@ function NewBookings(props) {
                                 />
 
                             </Form.Group>
+                        </Row>
+
+                        <Row>
+                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                <Form.Label>End Date</Form.Label>
+                                <Form.Control type="date"
+                                    name="endDate" value={endDate}
+                                    min={moment(userDate).format("YYYY-MM-DD")}
+                                    onChange={handleChange} />
+                            </Form.Group>
+
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>End Time (For)</Form.Label>
                                 <Form.Control type="time" name="endTime"
+                                    min={"23:"}
                                     value={endTime}
                                     onChange={handleChange}
                                 />
@@ -223,7 +265,7 @@ function NewBookings(props) {
                         </Row> */}
                         <div className="container">
                             <Row className="d-flex justify-content-around">
-                                {!bookSlot ? <Button type="button" className="col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { setBookSlot(true); checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
+                                {!bookSlot ? <Button type="button" className="col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
                                     : <Button className="col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
                                 }
                             </Row>
@@ -238,7 +280,7 @@ function NewBookings(props) {
                         {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Booked" : "Available"} Slots of this Date: {userDate} <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>&nbsp; Click Here</span></small>}
                     </div>
                     {slotsAvailablity ?
-                        <ShowSlotsTiming userDate={state.userDate} address={address} bookings={bookings} />
+                        <ShowSlotsTiming passData={passData} />
                         : showSlots ?
                             <>
                                 <p className="text-center text-info mt-2 select">Select any one of the folllowing Available Slots</p>

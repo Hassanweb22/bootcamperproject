@@ -141,7 +141,7 @@ h2.no_bookings {
 }
 
 .showslotsTiming .table-responsive{
-  height: 250px !important;
+  /* height: 250px !important; */
 }
 
 .showslotsTiming table tbody tr td.no_data {

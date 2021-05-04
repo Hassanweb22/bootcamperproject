@@ -199,17 +199,19 @@ function AllBookings() {
                                 <tr>
                                     <th>#</th>
                                     <th>location</th>
-                                    <th>Slot no</th>
-                                    <th>date</th>
+                                    <th>slot no</th>
+                                    <th>Start Date</th>
                                     <th>Start Time</th>
+                                    <th>End Date</th>
                                     <th>End Time</th>
-                                    <th>Total Time</th>
+                                    <th>Time Duration</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-light">
                                 {newArray.map((user, index) => {
                                     let startTime = moment(user.userDate + " " + user.startTime)
-                                    let endTime = moment(user.userDate + " " + user.endTime)
+                                    let endTime = moment(user.endDate + " " + user.endTime)
+                                    let duration = `${user.timeDuration[0]}D/${user.timeDuration[1]}H/${user.timeDuration[2]}M`
 
                                     return <tr key={user.bookingId}>
                                         <td>{index + 1}</td>
@@ -217,8 +219,9 @@ function AllBookings() {
                                         <td>{user.slots}</td>
                                         <td>{user.userDate}</td>
                                         <td>{startTime.format("h:mm a")}</td>
+                                        <td>{user.endDate}</td>
                                         <td>{endTime.format("h:mm a")}</td>
-                                        <td>{user.totalTime}</td>
+                                        <td>{duration}</td>
                                     </tr>
                                 })}
                             </tbody>

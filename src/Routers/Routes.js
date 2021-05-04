@@ -14,7 +14,7 @@ import AddLocations from '../Admin/AddLocations';
 import ViewLocations from '../Admin/ViewLocations';
 import firebase from "../Components/firebase/index"
 import NavBar from '../Components/NavBar';
-// import PrivateRoutes from "./PrivateRoute"
+import PrivateRoutes from "./PrivateRoute"
 // import LoginRoutes from "./LoginRoutes"
 // import { useSelector, useDispatch } from "react-redux"
 
@@ -47,37 +47,25 @@ export default function Routes() {
         return () => console.log("something has removed")
     }, [firebase.auth().currentUser])
 
-
     return (
         <Router>
             <NavBar />
             <Switch>
-                <Route exact path="/" component={Login} />
-                {!admin?.email && !loginUser?.email ?
-                    <>  <Route exact path="/" component={Login} />
-                        <Route exact path="/Signup" component={SignUp} />
-                        <Route exact path="/forget" component={forgetPassword} />
-                    </>
-                    : null
-                }
-                {Object.keys(admin).length > 0 ?
-                    <>
-                        <Route exact path="/allusers" component={Allusers} />
-                        <Route exact path="/allbookings" component={AllBookings} />
-                        <Route exact path="/adminDashboard" component={AdminDashboard} />
-                        <Route exact path="/viewlocations" component={ViewLocations} />
-                        <Route exact path="/addlocations" component={AddLocations} />
-                    </>
-                    : <Route exact path="/notfound" render={() => <h1>Not Found</h1>} />
-                }
-                {Object.keys(loginUser).length > 0 ?
-                    <>
-                        <Route exact path="/dashboard" component={Dashboard} />
-                        <Route exact path="/showbookings" component={ShowBookings} />
-                        <Route exact path="/locations/:address/:totalSlots" component={NewBookings} />
-                        <Route exact path="/locations" component={Locations} />
-                    </>
-                    : null}
+                <PrivateRoutes exact path="/" component={Login} redirectTo={!!Object.keys(admin).length ? "/adminDashboard" : "/dashboard"} isLogin />
+                <PrivateRoutes exact path="/Signup" component={SignUp} redirectTo={!!Object.keys(admin).length ? "/adminDashboard" : "/dashboard"} isLogin />
+                <PrivateRoutes exact path="/forget" component={forgetPassword} redirectTo={!!Object.keys(admin).length ? "/adminDashboard" : "/dashboard"} isLogin />
+
+                <PrivateRoutes exact path="/allusers" component={Allusers} redirectTo="/" isUser={!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/allbookings" component={AllBookings} redirectTo="/" isUser={!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/adminDashboard" component={AdminDashboard} redirectTo="/" isUser={!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/viewlocations" component={ViewLocations} redirectTo="/" isUser={!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/addlocations" component={AddLocations} redirectTo="/" isUser={!Object.keys(admin).length} />
+
+                <PrivateRoutes exact path="/dashboard" component={Dashboard} redirectTo="/" isAdmin={!!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/showbookings" component={ShowBookings} redirectTo="/" isAdmin={!!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/locations/:address/:totalSlots" component={NewBookings} redirectTo="/" isAdmin={!!Object.keys(admin).length} />
+                <PrivateRoutes exact path="/locations" component={Locations} redirectTo="/" isAdmin={!!Object.keys(admin).length} />
+
             </Switch>
         </Router >
     )
