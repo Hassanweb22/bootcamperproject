@@ -245,7 +245,6 @@ function NewBookings(props) {
                             <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
                                 <Form.Label>End Time (For)</Form.Label>
                                 <Form.Control type="time" name="endTime"
-                                    min={"23:"}
                                     value={endTime}
                                     onChange={handleChange}
                                 />
