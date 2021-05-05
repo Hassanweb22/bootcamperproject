@@ -40,7 +40,14 @@ function NewBookings(props) {
     let [error, setError] = useState(inititialErrors)
     let { location, slots, userDate, endDate, startTime, endTime } = state
 
+    const [currentUser, setCurrentUser] = useState({})
+
     useEffect(() => {
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user !== null && user?.email !== "admin@gmail.com") {
+                setCurrentUser(user)
+            }
+        });
         firebase.database().ref("clients/").on("value", snapshot => {
             let newArray = []
             Object.keys(snapshot.val()).map(user => {
@@ -177,12 +184,12 @@ function NewBookings(props) {
                     setTimeout(() => {
                         setSuccess(false)
                     }, 5000);
+                    setState(initialState)
+                    setSlotNo("")
+                    setShowSlots(false)
+                    setSlotsAvailablity(false)
                 }
             });
-        setState(initialState)
-        setSlotNo("")
-        setShowSlots(false)
-        setSlotsAvailablity(false)
 
     }
 
@@ -194,17 +201,18 @@ function NewBookings(props) {
 
 
     return (
-
-        <div className="container my-3">
-            <div className="users_heading">
-                <h2 className="text-center text-capitalize">
-                    Parking Booking
+        !!Object.keys(currentUser).length ?
+            <>
+                <div className="container my-3">
+                    <div className="users_heading">
+                        <h2 className="text-center text-capitalize">
+                            Parking Booking
                 </h2>
-            </div>
-            <div className="row show">
-                <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
-                    <Form className="my-3" onSubmit={handleSubmit}>
-                        {/* <Row>
+                    </div>
+                    <div className="row show">
+                        <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
+                            <Form className="my-3" onSubmit={handleSubmit}>
+                                {/* <Row>
                             <Form.Group className=" col-12">
                                 <Form.Label>Select Location</Form.Label>
                                 <Form.Control className="text-capitalize" name="location"
@@ -214,47 +222,47 @@ function NewBookings(props) {
                             </Form.Group>
                         </Row> */}
 
-                        <Row>
-                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>Start Date</Form.Label>
-                                <Form.Control type="date" min={moment().format("YYYY-MM-DD")} name="userDate" value={userDate}
-                                    onChange={handleChange} />
-                            </Form.Group>
+                                <Row>
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                        <Form.Label>Start Date</Form.Label>
+                                        <Form.Control type="date" min={moment().format("YYYY-MM-DD")} name="userDate" value={userDate}
+                                            onChange={handleChange} />
+                                    </Form.Group>
 
-                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>Start Time</Form.Label>
-                                <Form.Control type="time" name="startTime"
-                                    value={startTime}
-                                    min={userDate == moment().format("YYYY-MM-DD") ? moment().format("H:mm") : ""}
-                                    disabled={!startTimeValidate()}
-                                    onChange={handleChange}
-                                />
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                        <Form.Label>Start Time</Form.Label>
+                                        <Form.Control type="time" name="startTime"
+                                            value={startTime}
+                                            min={userDate == moment().format("YYYY-MM-DD") ? moment().format("H:mm") : ""}
+                                            disabled={!startTimeValidate()}
+                                            onChange={handleChange}
+                                        />
 
-                            </Form.Group>
-                        </Row>
+                                    </Form.Group>
+                                </Row>
 
-                        <Row>
-                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>End Date</Form.Label>
-                                <Form.Control type="date"
-                                    name="endDate" value={endDate}
-                                    min={moment(userDate).format("YYYY-MM-DD")}
-                                    onChange={handleChange} />
-                            </Form.Group>
+                                <Row>
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                        <Form.Label>End Date</Form.Label>
+                                        <Form.Control type="date"
+                                            name="endDate" value={endDate}
+                                            min={moment(userDate).format("YYYY-MM-DD")}
+                                            onChange={handleChange} />
+                                    </Form.Group>
 
-                            <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
-                                <Form.Label>End Time (For)</Form.Label>
-                                <Form.Control type="time" name="endTime"
-                                    value={endTime}
-                                    onChange={handleChange}
-                                />
-                                {error.isAfter || error.timeLimit ? <small className="text-danger">{error.isAfter || error.timeLimit}</small> : null}
-                                {success ? <small className="text-success font-weight-bold">Booking added Successfully</small> : null}
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                        <Form.Label>End Time (For)</Form.Label>
+                                        <Form.Control type="time" name="endTime"
+                                            value={endTime}
+                                            onChange={handleChange}
+                                        />
+                                        {error.isAfter || error.timeLimit ? <small className="text-danger">{error.isAfter || error.timeLimit}</small> : null}
+                                        {success ? <small className="text-success font-weight-bold">Booking added Successfully</small> : null}
 
-                            </Form.Group>
-                        </Row>
+                                    </Form.Group>
+                                </Row>
 
-                        {/* <Row>
+                                {/* <Row>
                             <Form.Group className="col-md-12" controlId="exampleForm.dateTime">
                                 <Form.Label>Slot No:</Form.Label>
                                 <Form.Control disabled={true} name="slotNo"
@@ -262,38 +270,39 @@ function NewBookings(props) {
                                 </Form.Control>
                             </Form.Group>
                         </Row> */}
-                        <div className="container">
-                            <Row className="d-flex justify-content-around">
-                                {!bookSlot ? <Button type="button" className="col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
-                                    : <Button className="col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
-                                }
-                            </Row>
-                        </div>
-                    </Form>
-                </Card>
-            </div>
-
-            <div className="row my-3 slots_Card mb-4" style={{ marginBottom: "20px !important" }}>
-                <Card className="container-fluid card_body bottom_card col-lg-12 col-sm-12 col-md-12 col-12 mx-auto p-3" >
-                    <div className="slots_nav">
-                        {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Booked" : "Available"} Slots of this Date: {userDate} <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>&nbsp; Click Here</span></small>}
+                                <div className="container">
+                                    <Row className="d-flex justify-content-around">
+                                        {!bookSlot ? <Button type="button" className="col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
+                                            : <Button className="col-12" variant="primary" type="submit" disabled={!validate()}>Book Slot</Button>
+                                        }
+                                    </Row>
+                                </div>
+                            </Form>
+                        </Card>
                     </div>
-                    {slotsAvailablity ?
-                        <ShowSlotsTiming passData={passData} />
-                        : showSlots ?
-                            <>
-                                <p className="text-center text-info mt-2 select">Select any one of the folllowing Available Slots</p>
-                                <Row className="text-center">
-                                    {noOfSlots.map(slot => {
-                                        return <Button className={`${slotNo === slot ? "buttonActive" : ""} `} variant="warning" onClick={() => setSlotNo(slot)} key={slot}>{slot}</Button>
-                                    })}
-                                    <p className="w-100 d-block mt-2" style={{ color: "white" }}>{error.conflicit} </p>
-                                </Row>
-                            </> : <p className="text-center my-auto" style={{ color: "white" }}>Press (Show Slots) Button After filling all fields To see available Slots</p>
-                    }
-                </Card>
-            </div >
-        </div >
+
+                    <div className="row my-3 slots_Card mb-4" style={{ marginBottom: "20px !important" }}>
+                        <Card className="container-fluid card_body bottom_card col-lg-12 col-sm-12 col-md-12 col-12 mx-auto p-3" >
+                            <div className="slots_nav">
+                                {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Booked" : "Available"} Slots of this Date: {userDate} <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>&nbsp; Click Here</span></small>}
+                            </div>
+                            {slotsAvailablity ?
+                                <ShowSlotsTiming passData={passData} />
+                                : showSlots ?
+                                    <>
+                                        <p className="text-center text-info mt-2 select">Select any one of the folllowing Available Slots</p>
+                                        <Row className="text-center">
+                                            {noOfSlots.map(slot => {
+                                                return <Button className={`${slotNo === slot ? "buttonActive" : ""} `} variant="warning" onClick={() => setSlotNo(slot)} key={slot}>{slot}</Button>
+                                            })}
+                                            <p className="w-100 d-block mt-2" style={{ color: "white" }}>{error.conflicit} </p>
+                                        </Row>
+                                    </> : <p className="text-center my-auto" style={{ color: "white" }}>Press (Show Slots) Button After filling all fields To see available Slots</p>
+                            }
+                        </Card>
+                    </div >
+                </div >
+            </> : null
     )
 }
 

@@ -11,20 +11,19 @@ function App() {
   useEffect(() => {
     const check = () => {
       const user = firebase.auth().currentUser
-      // firebase.auth().onAuthStateChanged((user) => {
+      firebase.auth().onAuthStateChanged((user) => {
         console.log("App.js user", user)
         if (!!user) {
-          firebase.database().ref("clients/").child(user.uid).on("child_changed", snapshot => {
+          firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
             if (snapshot.val().hasOwnProperty('block')) {
               if (snapshot.val()?.block === true) {
                 console.log("App.js Block", snapshot.val().block)
                 firebase.auth().signOut()
-                return
               }
             }
           })
         }
-      // })
+      })
     }
     check()
   }, [])

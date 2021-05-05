@@ -14,7 +14,7 @@ function AllBookings() {
             if (user) {
                 setcurrentUser(user)
                 firebase.database().ref("clients/").on("value", snapshot => {
-                    console.log("Admin_AllBookings_FireBase", snapshot.val())
+                    // console.log("Admin_AllBookings_FireBase", snapshot.val())
                     if (snapshot.val() !== null) {
                         let allusers = Object.keys(snapshot.val()).filter(user => {
                             return snapshot.val()[user].username !== "admin"
@@ -34,7 +34,7 @@ function AllBookings() {
             console.log("AllUsers Unmounted")
         }
     }, [])
-    console.log({ allUsers, currentUser })
+    // console.log({ allUsers, currentUser })
 
 
     return (

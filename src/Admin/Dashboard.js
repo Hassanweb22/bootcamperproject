@@ -9,18 +9,18 @@ export default function Dashboard() {
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
+            if (!!user) {
                 firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
                     setAdmin(snapshot.val())
+                    console.log("dashboardadmin", admin)
                 })
             } else {
-                console.log("No user Found", user?.uid)
+                // console.log("No user Found", user?.uid)
             }
         });
         return () => console.log("AdminDashboard has removed")
     }, [])
 
-    console.log("dashboardadmin", admin)
     return (
         <div>
             <div className="container">

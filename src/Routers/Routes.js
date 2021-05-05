@@ -26,7 +26,6 @@ export default function Routes() {
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((user) => {
-            // console.log("user", user)
             if (!!user) {
                 localStorage.setItem('loginUser', JSON.stringify(user));
                 if (user?.email === "admin@gmail.com") {
@@ -43,7 +42,7 @@ export default function Routes() {
                 setLoginUser({})
             }
         })
-        console.log("currentState", JSON.parse(localStorage.getItem("loginUser")))
+        // console.log("currentState", JSON.parse(localStorage.getItem("loginUser")))
         return () => console.log("something has removed")
     }, [firebase.auth().currentUser])
 
@@ -60,6 +59,7 @@ export default function Routes() {
                 <PrivateRoutes exact path="/adminDashboard" component={AdminDashboard} redirectTo="/" isUser={!Object.keys(admin).length} />
                 <PrivateRoutes exact path="/viewlocations" component={ViewLocations} redirectTo="/" isUser={!Object.keys(admin).length} />
                 <PrivateRoutes exact path="/addlocations" component={AddLocations} redirectTo="/" isUser={!Object.keys(admin).length} />
+
 
                 <PrivateRoutes exact path="/dashboard" component={Dashboard} redirectTo="/" isAdmin={!!Object.keys(admin).length} />
                 <PrivateRoutes exact path="/showbookings" component={ShowBookings} redirectTo="/" isAdmin={!!Object.keys(admin).length} />

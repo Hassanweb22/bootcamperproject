@@ -22,7 +22,7 @@ function AllBookings() {
             if (user) {
                 firebase.database().ref("clients/").on("value", snapshot => {
                     let newArray = []
-                    console.log("AllBookings userData FireBase", snapshot.val())
+                    // console.log("AllBookings userData FireBase", snapshot.val())
                     Object.keys(snapshot.val()).map(user => {
                         if (snapshot.val()[user].hasOwnProperty('bookings') === true) {
                             return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
@@ -53,12 +53,17 @@ function AllBookings() {
         array = array.sort((a, b) => {
             return new Date(b.userDate).getTime() - new Date(a.userDate).getTime()
         });
-        console.log("time", array)
         array = array.sort((a, b) => {
             if (new Date(a.userDate).getTime() === new Date(b.userDate).getTime()) {
                 if (Number(b.startTime.split(":")[0]) < Number(a.startTime.split(":")[0])) {
                     return 1
-                } else {
+                }
+                else if (Number(b.startTime.split(":")[0]) === Number(a.startTime.split(":")[0])) {
+                    if (Number(b.startTime.split(":")[1]) < Number(a.startTime.split(":")[1])) {
+                        return 1
+                    }
+                }
+                else {
                     return -1
                 }
             }
@@ -80,11 +85,6 @@ function AllBookings() {
             array = array.sort((a, b) => {
                 return new Date(b.userDate).getTime() - new Date(a.userDate).getTime()
             });
-            setnewArray(array)
-        }
-        else if (sort === "time") {
-            let array = [...newArray]
-            array.sort((b, a) => moment(a.userDate + " " + a.startTime).format('hmm') - moment(b.userDate + " " + b.startTime).format('hmm'))
             setnewArray(array)
         }
         else if (sort === "slot") {
@@ -183,7 +183,6 @@ function AllBookings() {
                                         onChange={(e) => handleChange(e)}>
                                         <option value="">Select Sort</option>
                                         <option value="date">by Date</option>
-                                        <option value="time">by time</option>
                                         <option value="datetime">by Date Time</option>
                                         <option value="slot">by slot</option>
                                     </Form.Control>
