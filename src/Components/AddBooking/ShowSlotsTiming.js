@@ -31,7 +31,7 @@ function ShowSlotsTiming({ passData }) {
                     {currentLocation.length > 0 ? currentLocation.map((data, index) => {
                         let startTime = moment(data.userDate + " " + data.startTime)
                         let endTime = moment(data.endDate + " " + data.endTime)
-                        let duration = `${data.timeDuration[0]}D/${data.timeDuration[1]}H/${data.timeDuration[2]}M`
+                        let duration = `${data.timeDuration[0]} Day ${data.timeDuration[1]} Hour ${data.timeDuration[2]} Minutes`
                         // let Total_time = moment(date).add(data.endTime, "hours").format("h:mm a")
                         return <tr className="text-capitalize" key={data.bookingId} >
                             <td>{data.slots}</td>

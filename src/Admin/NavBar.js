@@ -17,9 +17,6 @@ export default function AdminNav() {
                 setAdmin(user)
             }
         })
-        // firebase.database().ref("clients/").on("value", snapshot => {
-        //   console.log("NavBar FbDatabase", snapshot.val())
-        // })
         return () => console.log("something has removed")
     }, [])
     console.log("Admin", admin)

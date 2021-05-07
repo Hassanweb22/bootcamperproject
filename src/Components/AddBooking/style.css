@@ -53,8 +53,9 @@ h2.no_bookings {
 }
 
 .slots_Card {
-  height: 300px;
-  margin: 0 auto !important;
+  /* height: 300px; */
+
+  /* margin: 0 auto !important; */
 }
 
 .slots_Card .card_body > div.row {

@@ -210,7 +210,7 @@ function AllBookings() {
                                 {newArray.map((user, index) => {
                                     let startTime = moment(user.userDate + " " + user.startTime)
                                     let endTime = moment(user.endDate + " " + user.endTime)
-                                    let duration = `${user.timeDuration[0]}D/${user.timeDuration[1]}H/${user.timeDuration[2]}M`
+                                    let duration = `${user.timeDuration[0]} Day ${user.timeDuration[1]} Hour ${user.timeDuration[2]} Minutes`
 
                                     return <tr key={user.bookingId}>
                                         <td>{index + 1}</td>

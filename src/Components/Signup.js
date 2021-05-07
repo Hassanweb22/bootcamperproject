@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button, Card, Alert, Spinner } from "react-bootstrap"
-import { Envelope, Eye, EyeSlash, Window } from "react-bootstrap-icons"
+import { Form, Button, Card, Spinner } from "react-bootstrap"
+import { Envelope, Eye, EyeSlash, Window, } from "react-bootstrap-icons"
 import { useHistory, Link } from 'react-router-dom'
-// import { X } from "react-bootstrap-icons"
 import firebase from "../Components/firebase/index.js"
 import "./style.css"
 
@@ -22,6 +21,8 @@ export default function SignUp() {
         username: ""
     })
     const [currentUser, setCurrentUser] = useState({})
+    const [loading, setLoading] = useState(false)
+
 
     let { email, password, username } = state
 
@@ -47,7 +48,7 @@ export default function SignUp() {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // console.log("state", state)
+        setLoading(true)
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(({ user }) => {
                 let obj = { username: titleCase(username), email: user.email, key: user.uid, bookings: {} }
@@ -61,12 +62,12 @@ export default function SignUp() {
                 console.log("SignUp-User", obj)
                 setState(initialState)
                 setvalidationError(initialState)
-                firebase.auth().signOut()
+                // firebase.auth().signOut()
                 history.push("/")
             })
             .catch((error) => {
-                var errorCode = error.code;
-                var errorMessage = error.message;
+                const errorCode = error.code;
+                const errorMessage = error.message;
                 console.log({ errorCode, errorMessage })
                 if (errorCode === "auth/email-already-in-use") {
                     setvalidationError({ ...validationError, email: "The Email is already been in use" })
@@ -74,9 +75,10 @@ export default function SignUp() {
                 else if (errorCode === "auth/weak-password") {
                     setvalidationError({ ...validationError, password: "Password should be at least 6 characters" })
                 }
+                setLoading(false)
             });
     }
-    let validate = () => (username && email && password) ? true : false
+    let validate = () => (username && email && password && !loading) ? true : false
 
 
     return (
@@ -89,6 +91,7 @@ export default function SignUp() {
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
 
                     <Form className="my-3" onSubmit={handleSubmit}>
+
                         <Form.Group className="input-group" controlId="formUsername">
                             <Form.Label className="d-block w-100">Username</Form.Label>
                             <Form.Control className="text-secondary" type="text" placeholder="Enter Username"
@@ -101,6 +104,7 @@ export default function SignUp() {
                             </div>
                             <Form.Text className="text-danger w-100">{validationError.usernmae}</Form.Text>
                         </Form.Group>
+
                         <Form.Group className="input-group" controlId="formEmail">
                             <Form.Label className="d-block w-100">Email</Form.Label>
                             <Form.Control className={`${validationError.email ? "is-invalid" : ""} text-secondary`} type="email" placeholder="Enter Email"
@@ -113,6 +117,7 @@ export default function SignUp() {
                             </div>
                             <Form.Text className="text-danger w-100">{validationError.email}</Form.Text>
                         </Form.Group>
+
                         <Form.Group className="input-group" controlId="formPassword">
                             <Form.Label className="d-block w-100">Password</Form.Label>
                             <Form.Control className={`${validationError.password ? "is-invalid" : ""} text-secondary`} placeholder="Password"
@@ -128,9 +133,22 @@ export default function SignUp() {
                             {/* <Form.Text className="text-dark">Password Must be greater than 5</Form.Text> */}
                             <Form.Text className="text-danger w-100">{validationError.password}</Form.Text>
                         </Form.Group>
-                        <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
+                        <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>
+                            {loading ? <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                                <span className="ml-2">Loading...</span>
+                            </> : "Submit"}
+                        </Button>
+
                     </Form>
                     <hr />
+
                     <div className="text-center mb-4 d-flex justify-content-center">
                         <b>OR</b>
                         <Link to="/" className="mx-2 font-weight-bold">Login</Link>

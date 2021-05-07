@@ -19,7 +19,6 @@ import PrivateRoutes from "./PrivateRoute"
 // import { useSelector, useDispatch } from "react-redux"
 
 export default function Routes() {
-    // const currentState = useSelector(state => state.task)
     const [admin, setAdmin] = useState({})
     const [loginUser, setLoginUser] = useState({})
     const [isAuth, setIsAuth] = useState(false)
@@ -42,9 +41,8 @@ export default function Routes() {
                 setLoginUser({})
             }
         })
-        // console.log("currentState", JSON.parse(localStorage.getItem("loginUser")))
         return () => console.log("something has removed")
-    }, [firebase.auth().currentUser])
+    }, [])
 
     return (
         <Router>

@@ -1,36 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import Routes from './Routers/Routes';
-import { useHistory } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import firebase from "./Components/firebase/index"
 import './App.css';
+import firebase from "./Components/firebase/index"
+import { withSwalInstance } from 'sweetalert2-react';
+import swal from 'sweetalert2';
+
+const SweetAlert = withSwalInstance(swal);
+
 
 
 function App() {
-  const history = useHistory()
+
+  const [state, setState] = useState({
+    show: false
+  })
+ 
+  const check = () => {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (!!user) {
+        firebase.database().ref("clients/").child(user?.uid).on("value", (snapshot) => {
+          if (snapshot.val()?.block === true) {
+            console.log("App.js Block", snapshot.val())
+            // console.log("localstorage", localUser)
+            setState({ show: true })
+          }
+        })
+      }
+    })
+  }
+
   useEffect(() => {
-    const check = () => {
-      const user = firebase.auth().currentUser
-      firebase.auth().onAuthStateChanged((user) => {
-        console.log("App.js user", user)
-        if (!!user) {
-          firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
-            if (snapshot.val().hasOwnProperty('block')) {
-              if (snapshot.val()?.block === true) {
-                console.log("App.js Block", snapshot.val().block)
-                firebase.auth().signOut()
-              }
-            }
-          })
-        }
-      })
-    }
     check()
+
   }, [])
 
 
+  const onConfirm = () => {
+    firebase.auth().signOut()
+    localStorage.removeItem("loginUser")
+    window.location.reload()
+    console.log('confirm');
+  }
+
   return (
     <div className="App">
+      <SweetAlert
+        show={state.show}
+        // title="You are Blocked"
+        type="warning"
+        text="You are Blocked"
+        onConfirm={() => {
+          onConfirm()
+        }}
+      />
       <Routes />
     </div>
   );

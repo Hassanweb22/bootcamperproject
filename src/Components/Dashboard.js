@@ -8,9 +8,8 @@ function Dashboard() {
     const [currentUser, setcurrentUser] = useState({})
 
     useEffect(() => {
-        // setcurrentUser(firebase.auth().currentUser)
         firebase.auth().onAuthStateChanged(function (user) {
-            if (user) {
+            if (!!user) {
                 firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
                     setcurrentUser(snapshot.val())
                 })

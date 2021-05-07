@@ -13,24 +13,20 @@ function ShowBookings() {
     const [currentUser, setCurrentUser] = useState({})
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged(function (user) {
-            if (user !== null && user?.email !== "admin@gmail.com") {
-                firebase.database().ref("clients/").child(user?.uid).on("value", snapshot => {
-                    console.log("ShowBookings userData FireBase", snapshot.val())
-                    setCurrentUser(snapshot.val())
-                    if (snapshot.val()?.bookings) {
-                        setBookings(snapshot.val()?.bookings)
-                    }
-                })
-            } else {
-                setCurrentUser(user)
-            }
-        });
-        return () => {
-            console.log("ShowBooking Unmounted")
+        const get = async () => {
+            await firebase.auth().onAuthStateChanged(function (user) {
+                if (user !== null && user?.email !== "admin@gmail.com") {
+                    firebase.database().ref("clients/").child(user?.uid).on("value", snapshot => {
+                        setCurrentUser(snapshot.val())
+                        if (snapshot.val()?.bookings) {
+                            setBookings(snapshot.val()?.bookings)
+                        }
+                    })
+                }
+            });
         }
+        get()
     }, [])
-    // console.log({ currentUser })
 
     return (
         Object.keys(currentUser).length ?
@@ -61,13 +57,11 @@ function ShowBookings() {
                                         <th>Time Duration</th>
                                     </tr>
                                 </thead>
-                                {/* console.log("Time", {startTime: user.startTime, endTime: moment(date).add(2, "hours").format("H:mm") }) */}
                                 <tbody className="bg-light">
                                     {Object.keys(bookings).map((key, index) => {
                                         let startTime = moment(bookings[key].userDate + " " + bookings[key].startTime)
                                         let endTime = moment(bookings[key].endDate + " " + bookings[key].endTime)
-                                        let duration = `${bookings[key].timeDuration[0]}D/${bookings[key].timeDuration[1]}H/${bookings[key].timeDuration[2]}M`
-                                        // let Total_time = moment(date).add(bookings[key].endTime, "hours").format("h:mm a")
+                                        let duration = `${bookings[key].timeDuration[0]} Day ${bookings[key].timeDuration[1]} Hour ${bookings[key].timeDuration[2]} Minutes`
                                         return <tr className="text-capitalize" key={key}>
                                             <td>{index + 1}</td>
                                             <td>{bookings[key].location}</td>

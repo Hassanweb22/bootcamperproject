@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Merriweather+Sans&display=swap");
 
 body {
-  font-family: "Merriweather Sans", sans-serif;
+  font-family: "Merriweather Sans", sans-serif !important;
   background-color: #18454ac0;
 }
 

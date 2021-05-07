@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button, Card, Alert } from "react-bootstrap"
+import { Form, Button, Card, Alert, Spinner } from "react-bootstrap"
 import { Envelope, Eye, EyeSlash } from "react-bootstrap-icons"
-import { useHistory, Redirect, Link } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
+import { useHistory, Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import firebase from "../Components/firebase/index"
-import { addUser } from "../store/action/action"
 import "./style.css"
 
 export default function Login() {
     let history = useHistory()
-    const dispatch = useDispatch()
-    const name = useSelector(state => state.task)
     let initialState = {
         email: "",
         password: "",
@@ -24,12 +21,12 @@ export default function Login() {
     }
     const [state, setState] = useState(initialState)
     const [showPassword, setShowPassword] = useState(true)
+    const [loading, setLoading] = useState(false)
     const [validationError, setvalidationError] = useState(initialErrors)
 
     let { email, password } = state
 
     useEffect(() => {
-      
         return () => console.log("Login Component unmounted")
     }, [])
 
@@ -46,17 +43,17 @@ export default function Login() {
         setvalidationError(initialErrors)
         let ifBlock
         firebase.database().ref("clients/").on("value", snapshot => {
-            // console.log("clients", snapshot.val())
             Object.keys(snapshot.val()).filter(user => {
                 if (snapshot.val()[user].email === state.email && snapshot.val()[user].block) {
                     ifBlock = snapshot.val()[user].email
                     setvalidationError({ ...validationError, block: "You have been Blocked" })
-                    // firebase.auth().signOut()
                 }
             })
         })
+
         if (!ifBlock) {
             setvalidationError({ ...validationError, block: "" })
+            setLoading(true)
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then(({ user }) => {
                     if (user.email === "admin@gmail.com") {
@@ -89,11 +86,14 @@ export default function Login() {
                     else {
                         setvalidationError(initialState)
                     }
+                    setLoading(false)
                 });
+            setvalidationError({ ...validationError, block: "" })
         }
+
     }
 
-    let validate = () => (state.email && state.password) ? true : false
+    let validate = () => (state.email && state.password && !loading) ? true : false
 
     return (
 
@@ -133,7 +133,18 @@ export default function Login() {
                             </div>
                             <Form.Text className="text-danger w-100">{validationError.password}</Form.Text>
                         </Form.Group>
-                        <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
+                        <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>
+                            {loading ? <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                />
+                                <span className="ml-2">Loading...</span>
+                            </> : "Submit"}
+                        </Button>
                     </Form>
                     {/* <hr /> */}
                     <div className="text-center mb-2 d-flex flex-column justify-content-center">

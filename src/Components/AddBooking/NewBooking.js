@@ -55,12 +55,11 @@ function NewBookings(props) {
                     return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                 }
             })
-            console.log("newArray", newArray)
+            // console.log("newArray", newArray)
             setBookings(newArray)
         })
 
         setNoOfSlots(Array(parseInt(totalSlots)).fill(1).map((x, y) => x + y))
-        // setShowSlots(false)
 
         return () => console.log("newbOOKING unmounted")
     }, [])
@@ -90,7 +89,7 @@ function NewBookings(props) {
         let timeLimit = userDate == endDate ? moment(userDate + " " + totalTime).isAfter(userDate + ' ' + "00:10") : true
         let isAfter = userDate == endDate ? add().isAfter(userDate + ' ' + "23:59") : false;
         if (isAfter) {
-            setError({ ...error, isAfter: "Time Should Not exceed 24 hours" })
+            setError({ ...error, isAfter: "End Time can not be grater than start Time" })
             console.log("isafter", isAfter, error.isAfter)
         }
         else if (!timeLimit) {
@@ -193,11 +192,9 @@ function NewBookings(props) {
 
     }
 
-    let getMinimumTime = () => {
-        return moment
-    }
-    let validate = () => (location && userDate && startTime && endTime && slotNo) ? true : false
-    let slotsValidate = () => (userDate && startTime && endTime) ? true : false
+
+    let validate = () => (location && endDate && userDate && startTime && endTime && slotNo) ? true : false
+    let slotsValidate = () => (userDate && endDate && startTime && endTime) ? true : false
 
 
     return (
@@ -212,24 +209,15 @@ function NewBookings(props) {
                     <div className="row show">
                         <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto " style={{ width: '40rem' }}>
                             <Form className="my-3" onSubmit={handleSubmit}>
-                                {/* <Row>
-                            <Form.Group className=" col-12">
-                                <Form.Label>Select Location</Form.Label>
-                                <Form.Control className="text-capitalize" name="location"
-                                    disabled
-                                    value={address}>
-                                </Form.Control>
-                            </Form.Group>
-                        </Row> */}
 
                                 <Row>
-                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime1">
                                         <Form.Label>Start Date</Form.Label>
                                         <Form.Control type="date" min={moment().format("YYYY-MM-DD")} name="userDate" value={userDate}
                                             onChange={handleChange} />
                                     </Form.Group>
 
-                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime2">
                                         <Form.Label>Start Time</Form.Label>
                                         <Form.Control type="time" name="startTime"
                                             value={startTime}
@@ -242,7 +230,7 @@ function NewBookings(props) {
                                 </Row>
 
                                 <Row>
-                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime3">
                                         <Form.Label>End Date</Form.Label>
                                         <Form.Control type="date"
                                             name="endDate" value={endDate}
@@ -250,7 +238,7 @@ function NewBookings(props) {
                                             onChange={handleChange} />
                                     </Form.Group>
 
-                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime">
+                                    <Form.Group className="col-md-6 col-12" controlId="exampleForm.dateTime4">
                                         <Form.Label>End Time (For)</Form.Label>
                                         <Form.Control type="time" name="endTime"
                                             value={endTime}
@@ -262,14 +250,6 @@ function NewBookings(props) {
                                     </Form.Group>
                                 </Row>
 
-                                {/* <Row>
-                            <Form.Group className="col-md-12" controlId="exampleForm.dateTime">
-                                <Form.Label>Slot No:</Form.Label>
-                                <Form.Control disabled={true} name="slotNo"
-                                    value={slotNo}>
-                                </Form.Control>
-                            </Form.Group>
-                        </Row> */}
                                 <div className="container">
                                     <Row className="d-flex justify-content-around">
                                         {!bookSlot ? <Button type="button" className="col-12 mb-2 mb-md-0 mb-lg-0" variant="outline-primary" color="primary" onClick={_ => { checkSlot(); setSlotsAvailablity(false) }} disabled={!slotsValidate()}>Show Slots</Button>
@@ -281,10 +261,10 @@ function NewBookings(props) {
                         </Card>
                     </div>
 
-                    <div className="row my-3 slots_Card mb-4" style={{ marginBottom: "20px !important" }}>
-                        <Card className="container-fluid card_body bottom_card col-lg-12 col-sm-12 col-md-12 col-12 mx-auto p-3" >
+                    <div className="row my-3 slots_Card">
+                        <Card className="container-fluid card_body bottom_card col-lg-11 col-sm-12 col-md-11 col-11 mx-auto p-3" >
                             <div className="slots_nav">
-                                {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Booked" : "Available"} Slots of this Date: {userDate} <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>&nbsp; Click Here</span></small>}
+                                {userDate && <small className="text-info text-center">To see {!slotsAvailablity ? "Unavailable" : "Available"} Slots  <span style={{ cursor: "pointer", color: "red" }} onClick={_ => setSlotsAvailablity(!slotsAvailablity)}>&nbsp; Click Here</span></small>}
                             </div>
                             {slotsAvailablity ?
                                 <ShowSlotsTiming passData={passData} />

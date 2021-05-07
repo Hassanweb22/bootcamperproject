@@ -102,13 +102,9 @@ function AddLocations() {
                             <Form.Label>No of Slots</Form.Label>
                             <Form.Control as="select" name="slots" value={slots} onChange={handleChange}>
                                 <option value="">Select SLots</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
+                               { Array(10).fill(1).map((x, y) => x + y).map(no=>{
+                                   return <option key={no} value={`${no}`}>{no}</option>
+                               })}
                             </Form.Control>
                         </Form.Group>
 
