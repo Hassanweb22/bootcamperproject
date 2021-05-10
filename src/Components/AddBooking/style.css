@@ -102,6 +102,30 @@ h2.no_bookings {
 /* .slots_Card .card_body > div.row > div > div {
 } */
 
+table.showBookings {
+  font-size: 15px;
+}
+
+table.showBookings td,
+table.showBookings th {
+  vertical-align: middle !important;
+}
+
+@media screen and (max-width: 450px) {
+  table.showBookings {
+    font-size: 12.5px;
+  }
+  table.showBookings td {
+    padding: 3px;
+  }
+  table.showBookings td.date {
+    min-width: 100px !important;
+  }
+  table.showBookings td.time {
+    min-width: 64px !important;
+  }
+}
+
 .slots_nav {
   display: flex;
   justify-content: center;
@@ -126,10 +150,9 @@ h2.no_bookings {
   }
 }
 
-.bottom_card{
-    background-color: #343a40 !important;
+.bottom_card {
+  background-color: #343a40 !important;
 }
-
 
 @media screen and (max-width: 480px) {
   .select {
@@ -137,11 +160,11 @@ h2.no_bookings {
   }
 }
 
-.showslotsTiming{
+.showslotsTiming {
   /* background-color: #2c383a; */
 }
 
-.showslotsTiming .table-responsive{
+.showslotsTiming .table-responsive {
   /* height: 250px !important; */
 }
 

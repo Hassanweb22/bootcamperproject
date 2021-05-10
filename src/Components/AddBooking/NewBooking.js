@@ -38,7 +38,7 @@ function NewBookings(props) {
     let [passData, setPassData] = useState([])
     const [success, setSuccess] = useState(false)
     let [error, setError] = useState(inititialErrors)
-    let { location, slots, userDate, endDate, startTime, endTime } = state
+    let { location, userDate, endDate, startTime, endTime } = state
 
     const [currentUser, setCurrentUser] = useState({})
 
@@ -155,15 +155,13 @@ function NewBookings(props) {
         setShowSlots(false)
         setBookSlot(false)
         setSlotNo("")
+        setPassData([])
         setError(inititialErrors)
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
         const { uid } = firebase.auth().currentUser
-        const totalTime = moment.utc(moment(userDate + " " + endTime).diff(moment(userDate + " " + startTime))).format("H:mm")
-
-        // console.log({ error })
 
         setBookSlot(false)
         const key = firebase.database().ref(`clients/${uid}/`).child("bookings").push().key

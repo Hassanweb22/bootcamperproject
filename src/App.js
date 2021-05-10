@@ -15,15 +15,17 @@ function App() {
   const [state, setState] = useState({
     show: false
   })
- 
+
   const check = () => {
     firebase.auth().onAuthStateChanged((user) => {
       if (!!user) {
         firebase.database().ref("clients/").child(user?.uid).on("value", (snapshot) => {
           if (snapshot.val()?.block === true) {
             console.log("App.js Block", snapshot.val())
-            // console.log("localstorage", localUser)
             setState({ show: true })
+          }
+          else {
+            setState({ show: false })
           }
         })
       }
@@ -40,7 +42,6 @@ function App() {
     firebase.auth().signOut()
     localStorage.removeItem("loginUser")
     window.location.reload()
-    console.log('confirm');
   }
 
   return (

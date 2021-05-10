@@ -6,17 +6,22 @@ import "./style.css"
 
 function ShowSlotsTiming({ passData }) {
     const [currentLocation, setCurrentLocation] = useState([])
+
     useEffect(() => {
-        console.log("passData", passData)
         setCurrentLocation(passData)
         return () => console.log("ShowSlotsTiming Unmounted")
     }, [passData])
+
+    const getDuration = (array) => {
+        let day = array[0] > 0 ? `${array[0]} Day ` : ""
+        let hour = array[1] > 0 ? `${array[1]} Hour ` : ""
+        let min = array[2] > 0 ? `${array[2]} Mins ` : ""
+        return day + hour + min
+    }
+
     return (
         <div className="showslotsTiming">
-            {/* <div className="d-flex justify-content-end">
-                <p style={{ color: "#35dcb8" }}>{userDate}</p>
-            </div> */}
-            <Table className="card_body rounded-4 text-center my-3" size="sm" responsive striped bordered hover>
+            <Table className="showBookings card_body rounded-4 text-center my-3" size="sm" responsive striped bordered hover>
                 <thead className="align-content-center thead-dark">
                     <tr className="text-capitalize">
                         <th>slot no</th>
@@ -31,14 +36,13 @@ function ShowSlotsTiming({ passData }) {
                     {currentLocation.length > 0 ? currentLocation.map((data, index) => {
                         let startTime = moment(data.userDate + " " + data.startTime)
                         let endTime = moment(data.endDate + " " + data.endTime)
-                        let duration = `${data.timeDuration[0]} Day ${data.timeDuration[1]} Hour ${data.timeDuration[2]} Minutes`
-                        // let Total_time = moment(date).add(data.endTime, "hours").format("h:mm a")
+                        let duration = getDuration(data.timeDuration)
                         return <tr className="text-capitalize" key={data.bookingId} >
                             <td>{data.slots}</td>
-                            <td>{data.userDate}</td>
-                            <td>{startTime.format("h:mm a")}</td>
-                            <td>{data.endDate}</td>
-                            <td>{endTime.format("h:mm a")}</td>
+                            <td className="date">{data.userDate}</td>
+                            <td className="time">{startTime.format("h:mm a")}</td>
+                            <td className="date">{data.endDate}</td>
+                            <td className="time">{endTime.format("h:mm a")}</td>
                             <td>{duration}</td>
                         </tr>
                     }) :

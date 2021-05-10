@@ -15,7 +15,7 @@ export default function Dashboard() {
                 })
             }
         });
-        return () => console.log("AdminDashboard has removed")
+        return () => console.log("AdminDashboard Unmounted")
     }, [])
 
     return (

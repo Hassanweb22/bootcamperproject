@@ -1,3 +1,12 @@
+.logo {
+  width: 85px;
+  height: 50px;
+}
+
+.navbarLinks {
+  margin-left: 10px !important;
+}
+
 .users_heading {
   margin: 20px;
 }
@@ -10,31 +19,32 @@
   margin: 0 0 0px;
   text-align: center;
   text-transform: uppercase;
-  text-shadow: -1px 2px 5px #17a3b850,
-    0px -1px 10px #272929a8;
+  text-shadow: -1px 2px 5px #17a3b850, 0px -1px 10px #272929a8;
 }
+
 @media screen and (max-width: 550px) {
+  .logo {
+    width: 71px;
+    height: 42px;
+  }
   .users_heading h2 {
-    font-size: 33px;
+    font-size: 27px;
     font-weight: 800;
     line-height: 30px;
+  }
+  .navbarLinks {
+    margin-left: 0px !important;
   }
 }
 
 table thead {
   border-radius: 10px;
 }
-/* table thead{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-} */
-
 .navbar-brand {
   font-size: 20px;
   margin-right: 0 !important;
 }
 
-.card_body a:hover{
+.card_body a:hover {
   text-decoration: none;
 }

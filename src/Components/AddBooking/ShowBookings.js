@@ -28,6 +28,13 @@ function ShowBookings() {
         get()
     }, [])
 
+    const getDuration = (array) => {
+        let day = array[0] > 0 ? `${array[0]} Day ` : ""
+        let hour = array[1] > 0 ? `${array[1]} Hour ` : ""
+        let min = array[2] > 0 ? `${array[2]} Mins ` : ""
+        return day + hour + min
+    }
+
     return (
         Object.keys(currentUser).length ?
             <>
@@ -44,7 +51,7 @@ function ShowBookings() {
                             <div className="text-center mx-auto">
                                 <h2 className="no_bookings">No Bookings Yet</h2>
                             </div>
-                            : <Table className="card_body rounded-4 text-center" responsive striped bordered hover>
+                            : <Table className="showBookings card_body rounded-4 text-center" responsive striped bordered hover>
                                 <thead className="align-content-center thead-dark">
                                     <tr className="text-capitalize">
                                         <th>#</th>
@@ -61,15 +68,15 @@ function ShowBookings() {
                                     {Object.keys(bookings).map((key, index) => {
                                         let startTime = moment(bookings[key].userDate + " " + bookings[key].startTime)
                                         let endTime = moment(bookings[key].endDate + " " + bookings[key].endTime)
-                                        let duration = `${bookings[key].timeDuration[0]} Day ${bookings[key].timeDuration[1]} Hour ${bookings[key].timeDuration[2]} Minutes`
+                                        let duration = getDuration(bookings[key].timeDuration)
                                         return <tr className="text-capitalize" key={key}>
                                             <td>{index + 1}</td>
                                             <td>{bookings[key].location}</td>
                                             <td>{bookings[key].slots}</td>
-                                            <td>{bookings[key].userDate}</td>
-                                            <td>{startTime.format("h:mm a")}</td>
-                                            <td>{bookings[key].endDate}</td>
-                                            <td>{endTime.format("h:mm a")}</td>
+                                            <td className="date">{bookings[key].userDate}</td>
+                                            <td className="time">{startTime.format("h:mm a")}</td>
+                                            <td className="date">{bookings[key].endDate}</td>
+                                            <td className="time">{endTime.format("h:mm a")}</td>
                                             <td>{duration}</td>
                                         </tr>
                                     })}

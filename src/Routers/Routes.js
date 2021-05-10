@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch} from "react-router-dom";
 import Locations from '../Components/AddBooking/Locations';
 import Login from "../Components/Login"
 import SignUp from "../Components/Signup"
@@ -15,13 +15,9 @@ import ViewLocations from '../Admin/ViewLocations';
 import firebase from "../Components/firebase/index"
 import NavBar from '../Components/NavBar';
 import PrivateRoutes from "./PrivateRoute"
-// import LoginRoutes from "./LoginRoutes"
-// import { useSelector, useDispatch } from "react-redux"
 
 export default function Routes() {
     const [admin, setAdmin] = useState({})
-    const [loginUser, setLoginUser] = useState({})
-    const [isAuth, setIsAuth] = useState(false)
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((user) => {
@@ -30,15 +26,9 @@ export default function Routes() {
                 if (user?.email === "admin@gmail.com") {
                     setAdmin(user)
                 }
-                else {
-                    setLoginUser(user)
-                    setIsAuth(true)
-                }
             }
             else {
-                setIsAuth(false)
                 setAdmin({})
-                setLoginUser({})
             }
         })
         return () => console.log("something has removed")

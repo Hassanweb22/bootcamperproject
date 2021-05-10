@@ -1,20 +1,65 @@
-.allBookings {
-  height: 650px;
-  overflow: auto;
-  z-index: 0;
+.users_heading p {
+  color: #212529;
+  font-family: "Raleway", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  margin: 4px 0 0px;
+  text-align: center;
+  text-transform: capitalize;
 }
 
-/* .allBookings table thead {
-  position: fixed;
-  z-index: 1;
-  margin-bottom: 20px;
-  width: 100%;
-} */
+.users_heading p span {
+  color: #cad0d7;
+  cursor: pointer;
+}
 
-/* .alert-success {
-  color: #38473c !important;
-  background-color: #23b946 !important;
-  border-color: #c3e6cb !important;
-  background-color: #20bf55;
-  background-image: linear-gradient(42deg, #20bf55 0%, #01baef 85%);
-} */
+.users_heading h2::selection,
+.users_heading p::selection,
+.users_heading span::selection {
+  color: none;
+  background: none;
+}
+
+@media screen and (max-width: 450px) {
+  .users_heading p {
+    margin: 4px 0 0px;
+  }
+}
+
+.tableDiv {
+  height: 470px !important;
+  overflow-y: auto;
+}
+
+table.allBookings {
+  font-size: 15px;
+}
+
+table.allBookings td,
+table.allUsers td,
+table.allBookings th,
+table.allUsers th {
+  vertical-align: middle !important;
+}
+
+@media screen and (max-width: 450px) {
+  table.allBookings,
+  table.allUsers {
+    font-size: 12.3px !important;
+  }
+  table.allBookings td {
+    padding: 5px;
+  }
+  table.allUsers td{
+    padding: 8px;
+  }
+  table.allBookings td.date {
+    min-width: 100px !important;
+  }
+  table.allBookings td.time {
+    min-width: 64px !important;
+  }
+  table.allBookings td.duration {
+    min-width: 100px !important;
+  }
+}

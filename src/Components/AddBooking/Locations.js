@@ -12,7 +12,7 @@ function Locations() {
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
-            if (user !== null && user?.email !== "admin@gmail.com") {
+            if (!!user && user?.email !== "admin@gmail.com") {
                 setCurrentUser(user)
             }
         });
@@ -23,7 +23,7 @@ function Locations() {
     return (
         !!Object.keys(currentUser).length ?
             <>
-                <div className="container mt-4">
+                <div className="container mt-5">
                     <div className="users_heading">
                         <h2 className="text-center text-capitalize" >
                             <ArrowLeftCircleFill onClick={() => history.goBack()} style={{ fontWeight: "bold", cursor: "pointer" }} />

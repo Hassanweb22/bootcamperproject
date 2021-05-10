@@ -67,12 +67,12 @@ export default function Login() {
                     setvalidationError(initialState)
                 })
                 .catch((error) => {
+                    setvalidationError({ ...validationError, block: "" })
                     const errorCode = error.code;
                     const errorMessage = error.message;
                     console.log({ errorCode, errorMessage })
                     if (error.code === "auth/user-not-found") {
                         setvalidationError({ ...validationError, email: "User have not found or may Have deleted" })
-                        // window.alert(errorCode + "/n" + errorMessage)
                     }
                     else if (error.code === "auth/wrong-password") {
                         setvalidationError({ ...validationError, password: "Password is invalid" })
@@ -88,7 +88,6 @@ export default function Login() {
                     }
                     setLoading(false)
                 });
-            setvalidationError({ ...validationError, block: "" })
         }
 
     }

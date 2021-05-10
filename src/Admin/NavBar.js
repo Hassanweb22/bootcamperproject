@@ -19,7 +19,6 @@ export default function AdminNav() {
         })
         return () => console.log("something has removed")
     }, [])
-    console.log("Admin", admin)
 
     const signOut = () => {
         firebase.auth().signOut()

@@ -7,15 +7,12 @@ import moment from "moment"
 
 function AllBookings() {
     const [allUsers, setAllUsers] = useState({})
-    const [currentUser, setcurrentUser] = useState({})
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                setcurrentUser(user)
                 firebase.database().ref("clients/").on("value", snapshot => {
-                    // console.log("Admin_AllBookings_FireBase", snapshot.val())
-                    if (snapshot.val() !== null) {
+                    if (!!snapshot.val()) {
                         let allusers = Object.keys(snapshot.val()).filter(user => {
                             return snapshot.val()[user].username !== "admin"
                         }).map(user => {
@@ -25,16 +22,11 @@ function AllBookings() {
                         setAllUsers(allusers)
                     }
                 })
-            } else {
-                console.log("No user Found", user?.uid)
             }
         });
         
-        return () => {
-            console.log("AllUsers Unmounted")
-        }
-    }, [])
-    // console.log({ allUsers, currentUser })
+        return () => false
+    }, []);
 
 
     return (
@@ -47,10 +39,9 @@ function AllBookings() {
                     <div className="text-center mx-auto">
                         <h2 className="no_bookings">No Users Yet</h2>
                     </div>
-                    : <Table className="card_body text-center" responsive striped bordered hover>
+                    : <Table className="allUsers card_body text-center" responsive striped bordered hover>
                         <thead className="align-content-center thead-dark">
                             <tr className="text-capitalize">
-                                {/* <th>Users ID</th> */}
                                 <th>username</th>
                                 <th>email</th>
                                 <th>Actions</th>
@@ -59,7 +50,6 @@ function AllBookings() {
                         <tbody className="bg-light">
                             {allUsers.map(user => {
                                 return <tr key={user.key}>
-                                    {/* <td>{key}</td> */}
                                     <td className="text-capitalize">{user.username}</td>
                                     <td>{user.email}</td>
                                     <td><Block item={user} block={user.block} id={user.key} size="sm" variant="danger" /></td>

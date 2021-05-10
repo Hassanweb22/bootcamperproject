@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button, Card, Alert, Spinner } from "react-bootstrap"
+import { Form, Button, Card, Alert } from "react-bootstrap"
 import { useHistory, Link } from 'react-router-dom'
 import firebase from "../Components/firebase/index"
 import "./style.css"
 
 function AddLocations() {
 
-    let history = useHistory()
     let initialState = {
         locationName: "",
         address: "",
@@ -23,10 +22,9 @@ function AddLocations() {
 
     useEffect(() => {
         firebase.database().ref("admin").child("locations").on("value", snapshot => {
-            // console.log("Firebase Locations", snapshot.val())
             setAllLocations(snapshot.val())
         })
-        return () => console.log("")
+        return () => false
     }, [])
 
     let { locationName, address, slots } = state
@@ -49,7 +47,7 @@ function AddLocations() {
         let checkLocation = Object.keys(allLocations).find(key => {
             return allLocations[key].locationName === titleCase(locationName)
         })
-        if (Object.keys(checkLocation ? checkLocation : []).length > 0) {
+        if (!!Object.keys(checkLocation ?? []).length) {
             console.log({ checkLocation })
             setvalidationError({ ...validationError, locationName: "This Location is Already Exists" })
         }
@@ -62,14 +60,16 @@ function AddLocations() {
                     if (err) {
                         console.log("Location Error", err)
                     }
+                    else {
+                        setSuccess(true)
+                        setTimeout(() => {
+                            setSuccess(false)
+                        }, 4000);
+                        console.log("state", obj)
+                        setState(initialState)
+                    }
                 }
             )
-            setSuccess(true)
-            setTimeout(() => {
-                setSuccess(false)
-            }, 4000);
-            console.log("state", obj)
-            setState(initialState)
         }
     }
 
@@ -86,8 +86,8 @@ function AddLocations() {
 
             <div className="row">
                 <Card className="card_body col-lg-8 col-sm-12 col-md-10 col-11 mx-auto py-3" style={{ width: '40rem' }}>
-                    {/* {(validationError?.access || validationError?.connection) ? <Alert className="" variant="danger">{validationError.access || validationError?.connection}</Alert> : null} */}
                     {success ? <Alert className="" variant="success">Location added Successfully</Alert> : null}
+
                     <Form className="mb-3" onSubmit={handleSubmit}>
                         <Form.Group controlId="formTitle">
                             <Form.Label className="ml-1">Location</Form.Label>
@@ -102,15 +102,15 @@ function AddLocations() {
                             <Form.Label>No of Slots</Form.Label>
                             <Form.Control as="select" name="slots" value={slots} onChange={handleChange}>
                                 <option value="">Select SLots</option>
-                               { Array(10).fill(1).map((x, y) => x + y).map(no=>{
-                                   return <option key={no} value={`${no}`}>{no}</option>
-                               })}
+                                {Array(10).fill(1).map((x, y) => x + y).map(no => {
+                                    return <option key={no} value={`${no}`}>{no}</option>
+                                })}
                             </Form.Control>
                         </Form.Group>
 
                         <Button className="w-100" variant="primary" type="submit" disabled={!validate()}>Submit</Button>
                     </Form>
-                    {/* <hr /> */}
+
                     <div className="text-center mb-2 d-flex flex-column justify-content-center">
                         <b>OR</b>
                         <div>
