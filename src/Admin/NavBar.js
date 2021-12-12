@@ -12,18 +12,16 @@ export default function AdminNav() {
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged((user) => {
-            console.log("user", user)
             if (user?.email === "admin@gmail.com") {
                 setAdmin(user)
             }
         })
-        return () => console.log("something has removed")
+        return () => ""
     }, [])
 
     const signOut = () => {
         firebase.auth().signOut()
-        history.push("./")
-        console.log("LogOut")
+        history.push("/")
     }
 
     return (
@@ -47,8 +45,7 @@ export default function AdminNav() {
                             </>}
                     </Nav>
                     <Form inline>
-                        {/* <Button variant="info" size="" onClick={() => console.log("currentUser", firebase.auth().currentUser)}>user</Button> */}
-                        <span className="mt-2 mt-md-0 mt-lg-0">{ admin ?
+                        <span className="mt-2 mt-md-0 mt-lg-0">{admin ?
                             <Button className="btn btn-block" variant="info" size="" onClick={signOut}>Logout</Button>
                             : <Button className="btn btn-block" variant="info" size="" onClick={() => history.push("/signup")}>Sign Up</Button>}
                         </span>

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Table } from "react-bootstrap"
 import firebase from "../Components/firebase/index"
-import Block from "./RemoveUser"
-import moment from "moment"
+import ActionsButton from "./ActionsButton"
+import { blockUser, deleteUserData } from "../utils/index"
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 
 function AllBookings() {
     const [allUsers, setAllUsers] = useState({})
+    const [deleteUser, setDeleteUser] = useState({})
 
     useEffect(() => {
         firebase.auth().onAuthStateChanged(function (user) {
@@ -18,13 +20,13 @@ function AllBookings() {
                         }).map(user => {
                             return snapshot.val()[user]
                         })
-                        console.log("except admin", allusers)
+                        // console.log("except admin", allusers)
                         setAllUsers(allusers)
                     }
                 })
             }
         });
-        
+
         return () => false
     }, []);
 
@@ -49,15 +51,52 @@ function AllBookings() {
                         </thead>
                         <tbody className="bg-light">
                             {allUsers.map(user => {
-                                return <tr key={user.key}>
-                                    <td className="text-capitalize">{user.username}</td>
-                                    <td>{user.email}</td>
-                                    <td><Block item={user} block={user.block} id={user.key} size="sm" variant="danger" /></td>
-                                </tr>
+                                return (
+                                    <tr key={user.key}>
+                                        <td className="text-capitalize">{user.username}</td>
+                                        <td>{user.email}</td>
+                                        <td className="d-flex justify-content-around flex-wrap">
+                                            <ActionsButton
+                                                size="sm"
+                                                variant="danger"
+                                                title={user.block ? "Unblock" : "Block"}
+                                                onClick={_ => blockUser(user, user.block)}
+                                            />
+                                            <ActionsButton
+                                                size="sm"
+                                                variant="danger"
+                                                title="Delete"
+                                                onClick={_ => setDeleteUser(user)}
+                                            />
+                                        </td>
+                                    </tr>
+                                )
                             })}
                         </tbody>
                     </Table>}
             </div>
+            {!!Object.keys(deleteUser).length && (
+                <SweetAlert
+                    warning
+                    showCancel
+                    confirmBtnText="Delete it!"
+                    confirmBtnBsStyle="danger"
+                    // title="Do you wanna Delete User?"
+                    onConfirm={() => {
+                        console.log("deleteUser", deleteUser)
+                        setDeleteUser({});
+                        deleteUserData(deleteUser) && setDeleteUser({});
+
+                    }}
+                    onCancel={() => {
+                        setDeleteUser({});
+                        return console.log("admin didn't delete user")
+                    }}
+                    allowEscape={false}
+                >
+                    Do you wanna Delete User?
+                </SweetAlert>
+            )}
         </div >
     )
 }

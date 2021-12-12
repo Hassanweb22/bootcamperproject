@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Card, Alert, Spinner } from "react-bootstrap"
-import { Envelope, Eye, EyeSlash } from "react-bootstrap-icons"
+import { Envelope, Eye, EyeSlash, Google as GoogleIcon } from "react-bootstrap-icons"
 import { useHistory, Link } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import firebase from "../Components/firebase/index"
+import firebase, { googleProvider } from "../Components/firebase/index"
+import { titleCase, errorsAtLogin, checkUserBlock } from "../utils/index"
 import "./style.css"
 
 export default function Login() {
@@ -26,10 +27,6 @@ export default function Login() {
 
     let { email, password } = state
 
-    useEffect(() => {
-        return () => console.log("Login Component unmounted")
-    }, [])
-
     const handleChange = (e) => {
         let { name, value } = e.target
         setState({
@@ -38,18 +35,12 @@ export default function Login() {
         })
         setvalidationError(initialErrors)
     }
+
     const handleSubmit = (e) => {
         e.preventDefault()
         setvalidationError(initialErrors)
-        let ifBlock
-        firebase.database().ref("clients/").on("value", snapshot => {
-            Object.keys(snapshot.val()).filter(user => {
-                if (snapshot.val()[user].email === state.email && snapshot.val()[user].block) {
-                    ifBlock = snapshot.val()[user].email
-                    setvalidationError({ ...validationError, block: "You have been Blocked" })
-                }
-            })
-        })
+
+        const ifBlock = checkUserBlock(state.email, setvalidationError, validationError)
 
         if (!ifBlock) {
             setvalidationError({ ...validationError, block: "" })
@@ -61,35 +52,48 @@ export default function Login() {
                     }
                     else {
                         history.push("/dashboard")
-                        console.log("Loginuser", user)
                     }
                     setState(initialState)
                     setvalidationError(initialState)
                 })
                 .catch((error) => {
-                    setvalidationError({ ...validationError, block: "" })
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    console.log({ errorCode, errorMessage })
-                    if (error.code === "auth/user-not-found") {
-                        setvalidationError({ ...validationError, email: "User have not found or may Have deleted" })
-                    }
-                    else if (error.code === "auth/wrong-password") {
-                        setvalidationError({ ...validationError, password: "Password is invalid" })
-                    }
-                    else if (error.code === "auth/too-many-requests") {
-                        setvalidationError({ ...validationError, access: "Too many try, Now Access to this account has been disabled" })
-                    }
-                    else if (error.code === "auth/network-request-failed") {
-                        setvalidationError({ ...validationError, connection: "Your Internet Connection has been disbaled" })
-                    }
-                    else {
-                        setvalidationError(initialState)
-                    }
+                    errorsAtLogin(error, setvalidationError, validationError, initialState)
                     setLoading(false)
                 });
         }
 
+    }
+
+    const handleSocialLogin = async () => {
+        setState(initialState)
+        try {
+            const googleSignIn = await firebase.auth().signInWithPopup(googleProvider)
+            const { additionalUserInfo: { isNewUser }, user: { displayName, email, uid } } = googleSignIn
+            console.log("googleSignIn", googleSignIn)
+
+            if (isNewUser) {
+                let obj = { username: titleCase(displayName), email: email, key: uid, bookings: {} }
+                return firebase.database().ref('clients/').child(uid).set(obj, err => console.log("error", err));
+            }
+            else {
+                const ifBlock = checkUserBlock(email, setvalidationError, validationError, true)
+                if (ifBlock) {
+                    firebase.auth().signOut()
+                }
+                else {
+                    setvalidationError({ ...validationError, block: "" })
+                    setLoading(true)
+                    setState(initialState)
+                    setvalidationError(initialState)
+                    history.push("/dashboard")
+                }
+            }
+
+            setLoading(false)
+
+        } catch (error) {
+            errorsAtLogin(error, setvalidationError, validationError, initialState, true)
+        }
     }
 
     let validate = () => (state.email && state.password && !loading) ? true : false
@@ -144,6 +148,15 @@ export default function Login() {
                                 <span className="ml-2">Loading...</span>
                             </> : "Submit"}
                         </Button>
+                        <Button
+                            className="w-100 mt-4"
+                            type="submit"
+                            style={{ fontWeight: "bold", background: "#e13719", borderColor: "#e13719" }}
+                            onClick={handleSocialLogin}
+                        >
+                            <GoogleIcon color="white" size={35} className="p-2" />
+                            Sign in with Google
+                        </Button>
                     </Form>
                     {/* <hr /> */}
                     <div className="text-center mb-2 d-flex flex-column justify-content-center">
@@ -154,6 +167,7 @@ export default function Login() {
                             <Link to="./forget" className="mx-2">Forget Password</Link>
                         </div>
                     </div>
+
                 </Card>
             </div>
         </div >
