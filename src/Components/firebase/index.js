@@ -12,4 +12,6 @@ let firebaseConfig = {
 };
 // Initialize Firebase
 
-export default firebase.initializeApp(firebaseConfig);;
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+export default firebase.initializeApp(firebaseConfig);

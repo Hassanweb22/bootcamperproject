@@ -7,7 +7,7 @@ export default function Dashboard() {
     let history = useHistory()
     let [admin, setAdmin] = useState({})
 
-    useEffect(() => {
+    const checkUser = () => {
         firebase.auth().onAuthStateChanged(function (user) {
             if (!!user) {
                 firebase.database().ref("clients/").child(user.uid).on("value", snapshot => {
@@ -15,7 +15,10 @@ export default function Dashboard() {
                 })
             }
         });
-        return () => console.log("AdminDashboard Unmounted")
+    }
+
+    useEffect(() => {
+        checkUser()
     }, [])
 
     return (

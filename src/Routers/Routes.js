@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Switch} from "react-router-dom";
+import { BrowserRouter as Router, Switch } from "react-router-dom";
 import Locations from '../Components/AddBooking/Locations';
 import Login from "../Components/Login"
 import SignUp from "../Components/Signup"

@@ -3,11 +3,7 @@ import Routes from './Routers/Routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import firebase from "./Components/firebase/index"
-import { withSwalInstance } from 'sweetalert2-react';
-import swal from 'sweetalert2';
-
-const SweetAlert = withSwalInstance(swal);
-
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 
 function App() {
@@ -21,7 +17,6 @@ function App() {
       if (!!user) {
         firebase.database().ref("clients/").child(user?.uid).on("value", (snapshot) => {
           if (snapshot.val()?.block === true) {
-            console.log("App.js Block", snapshot.val())
             setState({ show: true })
           }
           else {
@@ -39,22 +34,25 @@ function App() {
 
 
   const onConfirm = () => {
-    firebase.auth().signOut()
+    firebase.auth().signOut().then(() => setState({ show: false }))
     localStorage.removeItem("loginUser")
     window.location.reload()
   }
 
   return (
     <div className="App">
-      <SweetAlert
-        show={state.show}
-        // title="You are Blocked"
-        type="warning"
-        text="You are Blocked"
-        onConfirm={() => {
-          onConfirm()
-        }}
-      />
+      {state.show && (
+        <SweetAlert
+          warning
+          confirmBtnText="Ok"
+          confirmBtnBsStyle="light"
+          onConfirm={() => {
+            onConfirm()
+          }}
+        >
+          <b>You are Blocked!</b>
+        </SweetAlert>
+      )}
       <Routes />
     </div>
   );

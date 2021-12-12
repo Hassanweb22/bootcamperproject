@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Card, Spinner } from "react-bootstrap"
-import { Envelope, Eye, EyeSlash, Window, } from "react-bootstrap-icons"
+import { Envelope, Eye, EyeSlash, Window } from "react-bootstrap-icons"
 import { useHistory, Link } from 'react-router-dom'
 import firebase from "../Components/firebase/index.js"
+import { titleCase } from "../utils/index"
 import "./style.css"
 
 
 export default function SignUp() {
+
     const history = useHistory()
     let initialState = {
         username: "",
@@ -41,11 +43,6 @@ export default function SignUp() {
 
     }
 
-    const titleCase = str => {
-        let str1 = str.toLowerCase()
-        return str1.replace(/(^|\s)\S/g, function (t) { return t.toUpperCase() });
-    }
-
     const handleSubmit = (e) => {
         e.preventDefault()
         setLoading(true)
@@ -78,6 +75,9 @@ export default function SignUp() {
                 setLoading(false)
             });
     }
+
+
+
     let validate = () => (username && email && password && !loading) ? true : false
 
 
@@ -145,7 +145,6 @@ export default function SignUp() {
                                 <span className="ml-2">Loading...</span>
                             </> : "Submit"}
                         </Button>
-
                     </Form>
                     <hr />
 

@@ -28,9 +28,11 @@ function AllBookings() {
                             return Object.keys(snapshot.val()[user]?.bookings).map(val => newArray.push(snapshot.val()[user]?.bookings[val]))
                         }
                     })
-                    console.log({ newArray })
+                    // console.log({ newArray })
                     setnewArray(newArray)
                     setBookings(newArray)
+
+                    // this is to get unique locations
                     let location = newArray.map(a => a.location).filter((v, i, a) => a.indexOf(v) === i);
                     setAllLocations(location)
                 })
@@ -114,7 +116,7 @@ function AllBookings() {
                     }
                 });
                 array = array.filter(data => data.location == address)
-                console.log("arrayFilter", array)
+                // console.log("arrayFilter", array)
                 setnewArray(array)
             }
         }
